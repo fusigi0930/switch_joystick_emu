@@ -1,30 +1,30 @@
-# Created by https://github.com/milador/XAC-Virtual-Joystick
+# Reference by https://github.com/milador/XAC-Virtual-Joystick
 #!/bin/bash
 
-sleep 10
+sleep 6
+SWITCHPRO=switch_pro
+JOYSTICK=pc_joystick 
 
-# Create xac_joystick gadget
+# Create joystick gadget
 cd /sys/kernel/config/usb_gadget/
-mkdir -p xac_joystick
-cd xac_joystick
-
-sudo su
+mkdir -p ${SWITCHPRO}
+cd ${SWITCHPRO}
 
 # Define USB specification
-echo 0x1d6b > idVendor # Linux Foundation
-echo 0x0104 > idProduct # Multifunction Composite Joystick Gadget
-echo 0x0100 > bcdDevice # v1.0.0
-echo 0x0200 > bcdUSB # USB2
-echo 0xEF > bDeviceClass
-echo 0x02 > bDeviceSubClass
-echo 0x01 > bDeviceProtocol
+echo 0x057e > idVendor
+echo 0x2009 > idProduct
+echo 0x0200 > bcdDevice            # v1.0.0
+echo 0x0210 > bcdUSB               # USB2
+echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
+echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
+echo 0x00 > bDeviceProtocol        # USB_CSCP_NoDeviceProtocol 0x00
 
 # Perform localization
 mkdir -p strings/0x409
 
-echo "0123456789" > strings/0x409/serialnumber
-echo "Raspberry Pi" > strings/0x409/manufacturer
-echo "XAC Virtual Joystick" > strings/0x409/product
+echo "000000000001" > strings/0x409/serialnumber
+echo "Nintendo Co., Ltd." > strings/0x409/manufacturer
+echo "Pro Controller" > strings/0x409/product
 
 
 # Define the functions of the device
@@ -33,21 +33,67 @@ echo 0 > functions/hid.usb0/protocol
 echo 0 > functions/hid.usb0/subclass
 echo 3 > functions/hid.usb0/report_length
 
-# Write report descriptor ( X and Y analog joysticks plus 8 buttons )
-echo "05010904A1011581257F0901A10009300931750895028102C005091901290815002501750195088102C0" | xxd -r -ps > functions/hid.usb0/report_desc
+
+echo "050115000904a1018530050105091901290a150025017501950a5500650081020509190b290e150025017501950481027501950281030b01000100a1000b300001000b310001000b320001000b35000100150027ffff0000751095048102c00b39000100150025073500463b0165147504950181020509190f2912150025017501950481027508953481030600ff852109017508953f8103858109027508953f8103850109037508953f9183851009047508953f9183858009057508953f9183858209067508953f9183c0" | xxd -r -ps > functions/hid.usb0/report_desc
 
 # Create configuration file
 mkdir configs/c.1
 mkdir configs/c.1/strings/0x409
 
 echo 0x80 > configs/c.1/bmAttributes
-echo 200 > configs/c.1/MaxPower # 200 mA
-echo "XAC configuration" > configs/c.1/strings/0x409/configuration
+echo 500 > configs/c.1/MaxPower # 200 mA
+echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
 
 # Link the configuration file
 ln -s functions/hid.usb0 configs/c.1
 
-# Activate device 
+# Activate device
+#ls /sys/class/udc > UDC
+
+sleep 3 
+
+
+# Create joystick gadget
+cd /sys/kernel/config/usb_gadget/
+mkdir -p ${JOYSTICK}
+cd ${JOYSTICK}
+
+# Define USB specification
+echo 0x0079 > idVendor
+echo 0x0122 > idProduct
+echo 0x0109 > bcdDevice            # v1.0.0
+echo 0x0210 > bcdUSB               # USB2
+echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
+echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
+echo 0x00 > bDeviceProtocol        # USB_CSCP_NoDeviceProtocol 0x00
+#
+# Perform localization
+mkdir -p strings/0x409
+
+echo "raspberry pi" > strings/0x409/manufacturer
+echo "switch pro virtual pad" > strings/0x409/product
+
+
+# Define the functions of the device
+mkdir functions/hid.usb1
+echo 0 > functions/hid.usb1/protocol
+echo 0 > functions/hid.usb1/subclass
+echo 3 > functions/hid.usb1/report_length
+
+echo "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495012507463b0165140939814265007501950c2501450105091901290c81020600ff750195082501450109018102c0a1027508950846ff0026ff0009029102750895040902b102c0c0" | xxd -r -ps > functions/hid.usb1/report_desc
+
+# Create configuration file
+mkdir configs/c.2
+mkdir configs/c.2/strings/0x409
+
+echo 0x80 > configs/c.2/bmAttributes
+echo 500 > configs/c.2/MaxPower # 200 mA
+echo "Switch Pro configuration" > configs/c.2/strings/0x409/configuration
+
+# Link the configuration file
+ln -s functions/hid.usb1 configs/c.2
+
+# Activate device
 ls /sys/class/udc > UDC
 
-sleep 10
+sleep 5

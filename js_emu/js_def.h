@@ -27,7 +27,7 @@
 #define AX_UPLEFT	(7ULL << 16)
 #define AX_MASK		~(0x0fULL << 16)
 
-#define JS_INIT_VALUE	0x8080808000080000ULL
+#define JS_INIT_VALUE	0x8080808080080000ULL
 
 #define SET_BUTTON(v,a)		{ v &= ~a; v |= a; }
 #define UNSET_BUTTON(v,a)	{ v &= ~a; }

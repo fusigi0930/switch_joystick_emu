@@ -1,7 +1,7 @@
 # Reference by https://github.com/milador/XAC-Virtual-Joystick
 #!/bin/bash
 
-sleep 6
+sleep 2
 SWITCHPRO=switch_pro
 JOYSTICK=pc_joystick 
 
@@ -13,7 +13,7 @@ cd ${SWITCHPRO}
 # Define USB specification
 echo 0x057e > idVendor
 echo 0x2009 > idProduct
-echo 0x0200 > bcdDevice            # v1.0.0
+echo 0x0109 > bcdDevice            # v1.0.0
 echo 0x0210 > bcdUSB               # USB2
 echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
 echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
@@ -47,33 +47,6 @@ echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
 # Link the configuration file
 ln -s functions/hid.usb0 configs/c.1
 
-# Activate device
-#ls /sys/class/udc > UDC
-
-sleep 3 
-
-
-# Create joystick gadget
-cd /sys/kernel/config/usb_gadget/
-mkdir -p ${JOYSTICK}
-cd ${JOYSTICK}
-
-# Define USB specification
-echo 0x0079 > idVendor
-echo 0x0122 > idProduct
-echo 0x0109 > bcdDevice            # v1.0.0
-echo 0x0210 > bcdUSB               # USB2
-echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
-echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
-echo 0x00 > bDeviceProtocol        # USB_CSCP_NoDeviceProtocol 0x00
-#
-# Perform localization
-mkdir -p strings/0x409
-
-echo "raspberry pi" > strings/0x409/manufacturer
-echo "switch pro virtual pad" > strings/0x409/product
-
-
 # Define the functions of the device
 mkdir functions/hid.usb1
 echo 0 > functions/hid.usb1/protocol
@@ -82,16 +55,8 @@ echo 3 > functions/hid.usb1/report_length
 
 echo "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495012507463b0165140939814265007501950c2501450105091901290c81020600ff750195082501450109018102c0a1027508950846ff0026ff0009029102750895040902b102c0c0" | xxd -r -ps > functions/hid.usb1/report_desc
 
-# Create configuration file
-mkdir configs/c.2
-mkdir configs/c.2/strings/0x409
-
-echo 0x80 > configs/c.2/bmAttributes
-echo 500 > configs/c.2/MaxPower # 200 mA
-echo "Switch Pro configuration" > configs/c.2/strings/0x409/configuration
-
 # Link the configuration file
-ln -s functions/hid.usb1 configs/c.2
+ln -s functions/hid.usb1 configs/c.1
 
 # Activate device
 ls /sys/class/udc > UDC

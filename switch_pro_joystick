@@ -15,7 +15,7 @@ function create_dev(){
   ln -s functions/hid.usb${ID} configs/c.1
 }
 
-sleep 2
+sleep 5
 SWITCHPRO=switch_pro
 
 # Create joystick gadget
@@ -255,4 +255,4 @@ create_dev 2 0 0 3 "05010904a101150025013500450175019510050919012910810205012507
 # Activate device
 ls /sys/class/udc > UDC
 
-sleep 5
+sleep 2

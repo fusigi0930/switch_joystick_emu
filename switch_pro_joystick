@@ -1,9 +1,29 @@
 # Reference by https://github.com/milador/XAC-Virtual-Joystick
 #!/bin/bash
 
+function create_dev()
+{
+  ID=$1
+  PROTO=$2
+  SUBCLASS=$3
+  REPORT_LENG=$4
+  mkdir -p functions/hid.usb${ID}
+  echo $PROTO > functions/hid.usb${ID}/protocol
+  echo $SUBCLASS > functions/hid.usb${ID}/subclass
+  echo $REPORT_LENG > functions/hid.usb${ID}/report_length
+  ln -s functions/hid.usb${ID} configs/c.1
+}
+
+function create_desc()
+{
+  ID=$1
+  DESC=$2
+  echo $DESC | xxd -r -ps > functions/hid.usb${ID}/report_desc
+}
+
+
 sleep 2
 SWITCHPRO=switch_pro
-JOYSTICK=pc_joystick 
 
 # Create joystick gadget
 cd /sys/kernel/config/usb_gadget/
@@ -26,13 +46,15 @@ echo "000000000001" > strings/0x409/serialnumber
 echo "Nintendo Co., Ltd." > strings/0x409/manufacturer
 echo "Pro Controller" > strings/0x409/product
 
+# Create configuration file
+mkdir -p configs/c.1
+mkdir -p configs/c.1/strings/0x409
+
+echo 0x80 > configs/c.1/bmAttributes
+echo 500 > configs/c.1/MaxPower # 200 mA
+echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
 
 # Define the functions of the device
-mkdir functions/hid.usb0
-echo 0 > functions/hid.usb0/protocol
-echo 0 > functions/hid.usb0/subclass
-echo 3 > functions/hid.usb0/report_length
-
 # 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 # 0x15, 0x00,        // Logical Minimum (0)
 # 0x09, 0x04,        // Usage (Joystick)
@@ -124,28 +146,14 @@ echo 3 > functions/hid.usb0/report_length
 # 0x95, 0x3F,        //   Report Count (63)
 # 0x91, 0x83,        //   Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Volatile)
 # 0xC0,              // End Collection
-# 
+#
 # // 203 bytes
-# 
+#
 
-echo "050115000904a1018530050105091901290a150025017501950a5500650081020509190b290e150025017501950481027501950281030b01000100a1000b300001000b310001000b320001000b35000100150027ffff0000751095048102c00b39000100150025073500463b0165147504950181020509190f2912150025017501950481027508953481030600ff852109017508953f8103858109027508953f8103850109037508953f9183851009047508953f9183858009057508953f9183858209067508953f9183c0" | xxd -r -ps > functions/hid.usb0/report_desc
-
-# Create configuration file
-mkdir configs/c.1
-mkdir configs/c.1/strings/0x409
-
-echo 0x80 > configs/c.1/bmAttributes
-echo 500 > configs/c.1/MaxPower # 200 mA
-echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
-
-# Link the configuration file
-ln -s functions/hid.usb0 configs/c.1
+create_dev 0 0 0 160
+create_desc 0 "050115000904a1018530050105091901290a150025017501950a5500650081020509190b290e150025017501950481027501950281030b01000100a1000b300001000b310001000b320001000b35000100150027ffff0000751095048102c00b39000100150025073500463b0165147504950181020509190f2912150025017501950481027508953481030600ff852109017508953f8103858109027508953f8103850109037508953f9183851009047508953f9183858009057508953f9183858209067508953f9183c0"
 
 # Define the functions of the device
-mkdir functions/hid.usb1
-echo 0 > functions/hid.usb1/protocol
-echo 0 > functions/hid.usb1/subclass
-echo 3 > functions/hid.usb1/report_length
 
 # 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 # 0x09, 0x04,        // Usage (Joystick)
@@ -200,18 +208,11 @@ echo 3 > functions/hid.usb1/report_length
 # 0xB1, 0x02,        //     Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
 # 0xC0,              //   End Collection
 # 0xC0,              // End Collection
-# 
+#
 # // 109 bytes
 
-echo "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495012507463b0165140939814265007501950c2501450105091901290c81020600ff750195082501450109018102c0a1027508950846ff0026ff0009029102750895040902b102c0c0" | xxd -r -ps > functions/hid.usb1/report_desc
-
-# Link the configuration file
-ln -s functions/hid.usb1 configs/c.1
-
-mkdir functions/hid.usb2
-echo 0 > functions/hid.usb2/protocol
-echo 0 > functions/hid.usb2/subclass
-echo 7 > functions/hid.usb2/report_length
+create_dev 1 0 0 8
+create_desc 1 "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495012507463b0165140939814265007501950c2501450105091901290c81020600ff750195082501450109018102c0a1027508950846ff0026ff0009029102750895040902b102c0c0"
 
 # 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 # 0x09, 0x04,        // Usage (Joystick)
@@ -254,13 +255,12 @@ echo 7 > functions/hid.usb2/report_length
 # 0x95, 0x08,        //   Report Count (8)
 # 0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
 # 0xC0,              // End Collection
-# 
+#
 # // 86 bytes
-# 
+#
 
-echo "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0" | xxd -r -ps > functions/hid.usb2/report_desc
-
-ln -s functions/hid.usb2 configs/c.1
+create_dev 2 0 0 3
+create_dev 2 "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0"
 
 # Activate device
 ls /sys/class/udc > UDC

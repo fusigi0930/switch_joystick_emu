@@ -1,5 +1,5 @@
-# Reference by https://github.com/milador/XAC-Virtual-Joystick
 #!/bin/bash
+# Reference by https://github.com/milador/XAC-Virtual-Joystick
 
 function create_dev(){
   ID=$1

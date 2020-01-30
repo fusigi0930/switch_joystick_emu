@@ -208,6 +208,15 @@ echo "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495
 # Link the configuration file
 ln -s functions/hid.usb1 configs/c.1
 
+mkdir functions/hid.usb2
+echo 0 > functions/hid.usb2/protocol
+echo 0 > functions/hid.usb2/subclass
+echo 7 > functions/hid.usb2/report_length
+
+echo "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0" | xxd -r -ps > functions/hid.usb2/report_desc
+
+ln -s functions/hid.usb2 configs/c.1
+
 # Activate device
 ls /sys/class/udc > UDC
 

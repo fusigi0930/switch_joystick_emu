@@ -38,20 +38,20 @@
 #endif
 
 #ifdef BUTTONS_16_FROM_GITHUB
-#define BTN_A       (1ULL << 48)
-#define BTN_B       (1ULL << 49)
-#define BTN_X       (1ULL << 50)
-#define BTN_Y       (1ULL << 51)
+#define BTN_1       (1ULL << 48)
+#define BTN_2       (1ULL << 49)
+#define BTN_3       (1ULL << 50)
+#define BTN_4       (1ULL << 51)
 
-#define BTN_L       (1ULL << 52)
-#define BTN_R       (1ULL << 53)
-#define BTN_LZ      (1ULL << 54)
-#define BTN_LZ      (1ULL << 55)
+#define BTN_5       (1ULL << 52)
+#define BTN_6       (1ULL << 53)
+#define BTN_7       (1ULL << 54)
+#define BTN_8       (1ULL << 55)
 
-#define BTN_MINUS	  (1ULL << 40)
-#define BTN_PLUS	  (1ULL << 41)
-#define BTN_L2		  (1ULL << 42)
-#define BTN_R2		  (1ULL << 43)
+#define BTN_9       (1ULL << 40)
+#define BTN_10      (1ULL << 41)
+#define BTN_11      (1ULL << 42)
+#define BTN_12      (1ULL << 43)
 
 #define BTN_13      (1ULL << 44)
 #define BTN_14      (1ULL << 45)

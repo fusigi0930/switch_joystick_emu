@@ -24,6 +24,7 @@ SRCS += $(CUR_DIR)/main.cpp
 
 INC :=
 INC += $(CUR_DIR)
+INC += $(CUR_DIR)/lua-5.3.2/src
 
 DEFINES :=
 DEFINES +=
@@ -47,6 +48,10 @@ CXXFLAGS += -fno-inline
 CXXFLAGS += -fPIE
 CXXFLAGS += $(INC) $(DEFINES) $(OPTIM)
 
+LIBDIR := -L$(CUR_DIR)/lua-5.3.2/src
+
+LIBS := $(LIBDIR) -llua
+
 LDFLAGS :=
 LDFLAGS += -pthread
 LDFLAGS += -fdata-sections -ffunction-sections
@@ -61,13 +66,17 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(MODULE): $(CXXOBJS)
+$(MODULE): build_lua $(CXXOBJS)
 	mkdir -p $(OUT_DIR)
 	$(file >$(BUILD_DIR)/build.release, $(shell find $(BUILD_DIR) -name "*.o"))
-	$(CXX) -o $(OUT_DIR)/$@ "@$(BUILD_DIR)/build.release" $(LDFLAGS)
+	$(CXX) -o $(OUT_DIR)/$@ "@$(BUILD_DIR)/build.release" $(LIBS) $(LDFLAGS)
 	@echo done
+
+build_lua:
+	make linux -j8 -C lua-5.3.2/src
 
 clean:
 	rm -rf $(BUILD_DIR)
+	make clean -C lua-5.3.2/src
 
 .PHONY: all clean %.cpp.o

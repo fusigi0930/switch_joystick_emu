@@ -1,5 +1,5 @@
-CUR_DIR := .
-BUILD_DIR := $(CUR_DIR)/build
+PROJ_DIR := .
+BUILD_DIR := $(PROJ_DIR)/build
 OUT_DIR := $(BUILD_DIR)/out
 
 MODULE := js_emu
@@ -20,11 +20,12 @@ MAKE    = make
 .SUFFIXES = .c .o .cpp .cpp.o .h
 
 SRCS :=
-SRCS += $(CUR_DIR)/main.cpp
+SRCS += $(PROJ_DIR)/main.cpp
+SRCS += $(PROJ_DIR)/js.cpp
 
 INC :=
-INC += $(CUR_DIR)
-INC += $(CUR_DIR)/lua-5.3.2/src
+INC += $(PROJ_DIR)
+INC += $(PROJ_DIR)/lua-5.3.2/src
 
 DEFINES :=
 DEFINES +=
@@ -48,7 +49,7 @@ CXXFLAGS += -fno-inline
 CXXFLAGS += -fPIE
 CXXFLAGS += $(INC) $(DEFINES) $(OPTIM)
 
-LIBDIR := -L$(CUR_DIR)/lua-5.3.2/src
+LIBDIR := -L$(PROJ_DIR)/lua-5.3.2/src
 
 LIBS := $(LIBDIR) -llua
 

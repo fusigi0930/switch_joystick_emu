@@ -74,34 +74,34 @@ void CJoyStick::button(std::string buttons, int press) {
 		buttons = buttons.substr(1);
 		switch(button) {
 			default: break;
-			case 'a': 1 == press ? SET_BTN(0, BTN_A) : UNSET_BTN(0, BTN_A); break;
-			case 'b': 1 == press ? SET_BTN(0, BTN_B) : UNSET_BTN(0, BTN_B); break;
-			case 'x': 1 == press ? SET_BTN(0, BTN_X) : UNSET_BTN(0, BTN_X); break;
-			case 'y': 1 == press ? SET_BTN(0, BTN_Y) : UNSET_BTN(0, BTN_Y); break;
-			case 'l': 1 == press ? SET_BTN(0, BTN_L) : UNSET_BTN(0, BTN_L); break;
-			case 'r': 1 == press ? SET_BTN(0, BTN_R) : UNSET_BTN(0, BTN_R); break;
+			case 'a': 0 != press ? SET_BTN(0, BTN_A) : UNSET_BTN(0, BTN_A); break;
+			case 'b': 0 != press ? SET_BTN(0, BTN_B) : UNSET_BTN(0, BTN_B); break;
+			case 'x': 0 != press ? SET_BTN(0, BTN_X) : UNSET_BTN(0, BTN_X); break;
+			case 'y': 0 != press ? SET_BTN(0, BTN_Y) : UNSET_BTN(0, BTN_Y); break;
+			case 'l': 0 != press ? SET_BTN(0, BTN_L) : UNSET_BTN(0, BTN_L); break;
+			case 'r': 0 != press ? SET_BTN(0, BTN_R) : UNSET_BTN(0, BTN_R); break;
 			case 'z':
 				button = buttons.at(0);
 				buttons = buttons.substr(1);
 				switch (button) {
 					default: break;
-					case 'l': 1 == press ? SET_BTN(0, BTN_ZL) : UNSET_BTN(0, BTN_ZL); break;
-					case 'r': 1 == press ? SET_BTN(0, BTN_ZR) : UNSET_BTN(0, BTN_ZR); break;
+					case 'l': 0 != press ? SET_BTN(0, BTN_ZL) : UNSET_BTN(0, BTN_ZL); break;
+					case 'r': 0 != press ? SET_BTN(0, BTN_ZR) : UNSET_BTN(0, BTN_ZR); break;
 				}
 				break;
-			case '-': 1 == press ? SET_BTN(1, BTN_M) : UNSET_BTN(1, BTN_M); break;
-			case '+': 1 == press ? SET_BTN(1, BTN_P) : UNSET_BTN(1, BTN_P); break;
+			case '-': 0 != press ? SET_BTN(1, BTN_M) : UNSET_BTN(1, BTN_M); break;
+			case '+': 0 != press ? SET_BTN(1, BTN_P) : UNSET_BTN(1, BTN_P); break;
 			case '3':
 				button = buttons.at(0);
 				buttons = buttons.substr(1);
 				switch (button) {
 					default: break;
-					case 'l': 1 == press ? SET_BTN(1, BTN_L3) : UNSET_BTN(1, BTN_L3); break;
-					case 'r': 1 == press ? SET_BTN(1, BTN_R3) : UNSET_BTN(1, BTN_R3); break;
+					case 'l': 0 != press ? SET_BTN(1, BTN_L3) : UNSET_BTN(1, BTN_L3); break;
+					case 'r': 0 != press ? SET_BTN(1, BTN_R3) : UNSET_BTN(1, BTN_R3); break;
 				}
 				break;
-			case 'h': 1 == press ? SET_BTN(1, BTN_HOME) : UNSET_BTN(1, BTN_HOME); break;
-			case 'c': 1 == press ? SET_BTN(1, BTN_CAPTURE) : UNSET_BTN(1, BTN_CAPTURE); break;
+			case 'h': 0 != press ? SET_BTN(1, BTN_HOME) : UNSET_BTN(1, BTN_HOME); break;
+			case 'c': 0 != press ? SET_BTN(1, BTN_CAPTURE) : UNSET_BTN(1, BTN_CAPTURE); break;
 		}
 	}
 }

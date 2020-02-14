@@ -22,10 +22,12 @@ MAKE    = make
 SRCS :=
 SRCS += $(PROJ_DIR)/main.cpp
 SRCS += $(PROJ_DIR)/js.cpp
+SRCS += $(PROJ_DIR)/clua.cpp
+SRCS += $(PROJ_DIR)/cluafunc.cpp
 
 INC :=
-INC += $(PROJ_DIR)
-INC += $(PROJ_DIR)/lua-5.3.2/src
+INC += -I$(PROJ_DIR)
+INC += -I$(PROJ_DIR)/lua-5.3.2/src
 
 DEFINES :=
 DEFINES +=

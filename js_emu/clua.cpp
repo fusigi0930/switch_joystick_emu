@@ -1,10 +1,10 @@
 #include "clua.h"
-#include "luafunc.h"
 #include <fstream>
+#include <sstream>
 
-CLua::CLua()
-{
+CLua::CLua() {
 	mLua = nullptr;
+	m_JoyStick = nullptr;
 	init();
 }
 
@@ -37,6 +37,10 @@ void CLua::setResult(std::string szResult) {
 	m_szPrintOut = szResult;
 }
 
+void CLua::setJoyStick(void *js) {
+	m_JoyStick = js;
+}
+
 std::string CLua::getResult() {
 	std::string ret = m_szPrintOut;
 	m_szPrintOut.clear();
@@ -48,11 +52,22 @@ void CLua::adjustLuaPath() {
 	lua_getglobal(mLua, "package");
 	lua_getfield(mLua, -1, "path");
 	std::string szEnvPath=lua_tostring(mLua, -1);
+	size_t pos = m_szFile.rfind('/');
+	std::string path = m_szFile.substr(0, pos);
+
+	if (std::string::npos == szEnvPath.find(path)) {
+		std::stringstream s;
+		s << szEnvPath << ";" << path << "/?.lua;";
+		lua_pop(mLua, 1);
+		lua_pushstring(mLua, s.str().c_str());
+		lua_setfield(mLua, -2, "path");
+		lua_pop(mLua, 1);
+	}
 }
 
 void CLua::runFile(std::string szFile) {
 	if (NULL == mLua) return;
-	if (szFile.empyt()) return;
+	if (szFile.empty()) return;
 	std::ifstream inFile;
 	inFile.open(szFile);
 	if(inFile.good()) return;
@@ -60,7 +75,7 @@ void CLua::runFile(std::string szFile) {
 	m_szFile=szFile;
 
 	adjustLuaPath();
-	if (luaL_loadfile(mLua, m_szFile.c_str()) {
+	if (luaL_loadfile(mLua, m_szFile.c_str())) {
 		return;
 	}
 

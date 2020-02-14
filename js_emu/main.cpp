@@ -26,9 +26,9 @@ option long_options[] = {
 };
 
 CJoyStick *g_js = nullptr;
+
 int g_nPort = 0;
 int g_sock = -1;
-
 std::thread *g_serverThread = nullptr;
 
 static void start_server() {

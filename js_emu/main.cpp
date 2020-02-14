@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "js.h"
+#include "clua.h"
 
 #define JS_DEV "/dev/hidg0"
 
@@ -67,8 +68,11 @@ int main(int argc, char* argv[]) {
 				g_nPort = std::stoi(reinterpret_cast<char*>(optarg));
 				start_server();
 				break;
-			case 't':
-				break;
+			case 't': {
+				CLua lua;
+				lua.setJoyStick(g_js);
+				lua.runString(reinterpret_cast<char*>(optarg));
+			}	break;
 			case 'c':
 				break;
 		}

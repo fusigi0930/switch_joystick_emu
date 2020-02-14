@@ -53,7 +53,7 @@ CXXFLAGS += $(INC) $(DEFINES) $(OPTIM)
 
 LIBDIR := -L$(PROJ_DIR)/lua-5.3.2/src
 
-LIBS := $(LIBDIR) -llua
+LIBS := $(LIBDIR) -llua -ldl
 
 LDFLAGS :=
 LDFLAGS += -pthread

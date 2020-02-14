@@ -54,9 +54,16 @@ void CJoyStick::resetJoyStick() {
 	if (-1 == m_nfd) {
 		init();
 	}
+	std::fill_n(m_vtReportData.begin(), REPORT_LENG, 0);
 	sendReport();
 	usleep(50000);
+	button("lr", 1);
+	sendReport();
 
+	usleep(50000);
+
+	button("lr", 0);
+	sendReport();
 }
 
 #define SET_BTN(l,v)		SET_BUTTON(m_vtReportData,l,v)

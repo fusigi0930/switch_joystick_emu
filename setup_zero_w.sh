@@ -8,3 +8,4 @@ sudo echo "dwc2" >> /etc/modules
 sudo echo "libcomposite" >> /etc/modules
 sudo echo "g_multi" >> /etc/modules
 
+sudo apt install libreadline-dev git gcc g++

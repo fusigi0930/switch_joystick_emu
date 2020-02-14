@@ -192,6 +192,7 @@ int CLua::luaSendButton(lua_State *L) {
 	}
 
 	js->button(szButtons, press);
+	js->sendReport();
 
 	return 0;
 }
@@ -226,6 +227,7 @@ int CLua::luaSendDirect(lua_State *L) {
 	}
 
 	js->axis(direction);
+	js->sendReport();
 
 	return 0;
 }
@@ -261,6 +263,7 @@ int CLua::luaSendAnalog(lua_State *L) {
 	}
 
 	js->aaxis(axis[0], axis[1], axis[2], axis[3]);
+	js->sendReport();
 
 	return 0;
 }

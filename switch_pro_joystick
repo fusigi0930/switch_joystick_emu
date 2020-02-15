@@ -23,9 +23,9 @@ mkdir -p ${SWITCHPRO}
 cd ${SWITCHPRO}
 
 # Define USB specification
-echo 0x057e > idVendor
-echo 0x2009 > idProduct
-echo 0x0200 > bcdDevice            # v1.0.0
+echo 0x0f0d > idVendor
+echo 0x00c1 > idProduct
+echo 0x0572 > bcdDevice            # v1.0.0
 echo 0x0200 > bcdUSB               # USB2
 echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
 echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
@@ -34,9 +34,9 @@ echo 0x00 > bDeviceProtocol        # USB_CSCP_NoDeviceProtocol 0x00
 # Perform localization
 mkdir -p strings/0x409
 
-echo "000000000001" > strings/0x409/serialnumber
-echo "Nintendo Co., Ltd." > strings/0x409/manufacturer
-echo "Pro Controller" > strings/0x409/product
+echo "" > strings/0x409/serialnumber
+echo "HORI CO.,LTD." > strings/0x409/manufacturer
+echo "HORIPAD S" > strings/0x409/product
 
 # Create configuration file
 mkdir configs/c.1
@@ -249,7 +249,8 @@ echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
 # // 86 bytes
 #
 
-create_dev 2 0 0 3 "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0"
+#create_dev 2 0 0 3 "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0"
+create_dev 3 0 0 64 "05010905A10115002501350045017501950E05091901290E81029502810105012507463B017504950165140939814265009501810126FF0046FF000930093109320935750895048102750895018101C0"
 
 # Activate device
 ls /sys/class/udc > UDC

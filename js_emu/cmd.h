@@ -12,6 +12,7 @@ enum PARAM_VALUE {
 	VALUE_FILE,
 	VALUE_STOP,
 	VALUE_QUIT,
+	VALUE_DISCONNECT,
 };
 
 class CCommand {

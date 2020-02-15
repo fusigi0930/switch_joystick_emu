@@ -14,12 +14,14 @@ CCommand::~CCommand() {
 #define CMD_FILE			"file"
 #define CMD_STOP			"stop"
 #define CMD_QUIT			"quit"
+#define CMD_DISCONNECT		"disconnect"
 
 static std::map<std::string, int> s_mapCmd = {
 	{ CMD_RUN,		VALUE_RUN },
 	{ CMD_FILE,		VALUE_FILE },
 	{ CMD_STOP,		VALUE_STOP },
 	{ CMD_QUIT,		VALUE_QUIT },
+	{ CMD_DISCONNECT, VALUE_DISCONNECT},
 };
 
 static int command_parser(std::string &cmd, std::vector<std::string> vtCmd) {

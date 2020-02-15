@@ -15,6 +15,7 @@
 
 #include "js.h"
 #include "clua.h"
+#include "cmd.h"
 
 #define JS_DEV "/dev/hidg0"
 
@@ -30,6 +31,14 @@ CJoyStick *g_js = nullptr;
 int g_nPort = 0;
 int g_sock = -1;
 std::thread *g_serverThread = nullptr;
+
+static void cmdRun(CCommand &cmd) {
+
+}
+
+static void cmdStop(CCommand &cmd) {
+
+}
 
 static void start_server() {
 	g_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -47,11 +56,27 @@ static void start_server() {
 		while (-1 != g_sock) {
 			unsigned int leng = sizeof(client);
 			int client_fd = ::accept(g_sock, reinterpret_cast<sockaddr*>(&client), &leng);
-			while (1) {
+			int nDisConn = 0;
+
+			while (0 == nDisConn) {
 				char szBuf[1024] = {0};
 				ssize_t ret = ::recv(client_fd, szBuf, sizeof(szBuf) -1, 0);
 				if (0 >= ret) {
 					break;
+				}
+
+				CCommand cmd;
+				cmd.command(szBuf);
+				switch (cmd.getParam(PARAM_CMD)) {
+					default: break;
+					case VALUE_RUN: cmdRun(cmd); break;
+					case VALUE_STOP: cmdStop(cmd); break;
+					case VALUE_DISCONNECT: nDisConn = 1; break;
+					case VALUE_QUIT:
+						::close(client_fd);
+						::close(g_sock);
+						g_sock = -1;
+						return;
 				}
 			}
 			::close(client_fd);

@@ -32,6 +32,7 @@ public:
 	std::string getAppendParam(std::string param);
 	void setParam(std::string param, int value);
 	void setAppendParam(std::string param, std::string value);
+	void clearStream();
 };
 
 #endif

@@ -19,6 +19,11 @@
 
 #define JS_DEV "/dev/hidg0"
 
+enum ESTATUS {
+	STATUS_NORMAL = 0,
+	STATUS_RUNNING,
+};
+
 #define SOPS "s:t:c:"
 option long_options[] = {
 	{"server", 1, 0, 's'},
@@ -31,12 +36,45 @@ CJoyStick *g_js = nullptr;
 int g_nPort = 0;
 int g_sock = -1;
 std::thread *g_serverThread = nullptr;
+std::thread *g_runThread = nullptr;
+std::mutex g_runMutex;
+CLua *g_pLua = nullptr;
+CCommand *g_pCmd = nullptr;
+int g_status = STATUS_NORMAL;
 
-static void cmdRun(CCommand &cmd) {
+static void cmdRun() {
+	if (STATUS_RUNNING == g_status) {
+		std::cout << "still running script file" << std::endl;
+		return;
+	}
 
+	g_runMutex.lock();
+	if (nullptr != g_runThread) {
+		delete g_runThread;
+		g_runThread = nullptr;
+	}
+
+	g_status = STATUS_RUNNING;
+	g_runThread = new std::thread([]()->void{
+		if (nullptr != g_pLua) {
+			delete g_pLua;
+			g_pLua = nullptr;
+		}
+		g_pLua = new CLua();
+		g_pLua->setJoyStick(g_js);
+
+		std::string szFile = g_pCmd->getAppendParam(PARAM_CMD);
+		g_pLua->runFile(szFile);
+
+		g_pLua->close();
+		delete g_pLua;
+		g_pLua = nullptr;
+		g_status = STATUS_NORMAL;
+		g_runMutex.unlock();
+	});
 }
 
-static void cmdStop(CCommand &cmd) {
+static void cmdStop() {
 
 }
 
@@ -50,6 +88,7 @@ static void start_server() {
 	in.sin_port = htons(g_nPort);
 	::bind(g_sock, reinterpret_cast<sockaddr*>(&in), sizeof(in));
 	::listen(g_sock, 5);
+	g_pCmd = new CCommand();
 	g_serverThread = new std::thread([]()->void{
 		// fetch command from network
 		sockaddr_in client = {0};
@@ -65,12 +104,12 @@ static void start_server() {
 					break;
 				}
 
-				CCommand cmd;
-				cmd.command(szBuf);
-				switch (cmd.getParam(PARAM_CMD)) {
+				g_pCmd->clearStream();
+				g_pCmd->command(szBuf);
+				switch (g_pCmd->getParam(PARAM_CMD)) {
 					default: break;
-					case VALUE_RUN: cmdRun(cmd); break;
-					case VALUE_STOP: cmdStop(cmd); break;
+					case VALUE_RUN: cmdRun(); break;
+					case VALUE_STOP: cmdStop(); break;
 					case VALUE_DISCONNECT: nDisConn = 1; break;
 					case VALUE_QUIT:
 						::close(client_fd);
@@ -115,6 +154,11 @@ int main(int argc, char* argv[]) {
 
 	if (nullptr != g_serverThread) {
 		g_serverThread->join();
+	}
+
+	if (nullptr != g_pCmd) {
+		delete g_pCmd;
+		g_pCmd = nullptr;
 	}
 
 	if (-1 != g_sock) {

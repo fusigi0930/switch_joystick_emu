@@ -40,6 +40,13 @@ static int command_parser(std::string &cmd, std::vector<std::string> vtCmd) {
 	return 0;
 }
 
+void CCommand::clearStream() {
+	m_stream.str("");
+	m_stream.clear();
+	m_res.str("");
+	m_res.clear();
+}
+
 void CCommand::command(std::string cmd) {
 	m_stream << cmd;
 	std::string szBuf;

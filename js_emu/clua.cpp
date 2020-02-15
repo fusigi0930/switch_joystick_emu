@@ -13,7 +13,7 @@ CLua::~CLua() {
 }
 
 void CLua::init() {
-	if (NULL == mLua) {
+	if (nullptr == mLua) {
 		mLua = luaL_newstate();
 	}
 	luaL_openlibs(mLua);
@@ -66,7 +66,7 @@ void CLua::adjustLuaPath() {
 }
 
 void CLua::runFile(std::string szFile) {
-	if (NULL == mLua) return;
+	if (nullptr == mLua) return;
 	if (szFile.empty()) return;
 	std::ifstream inFile;
 	inFile.open(szFile);
@@ -86,7 +86,7 @@ void CLua::runFile(std::string szFile) {
 }
 
 void CLua::runString(std::string szScript) {
-	if (NULL == mLua) return;
+	if (nullptr == mLua) return;
 	if (szScript.empty()) return;
 
 	luaL_dostring(mLua, szScript.c_str());

@@ -24,6 +24,7 @@ SRCS += $(PROJ_DIR)/main.cpp
 SRCS += $(PROJ_DIR)/js.cpp
 SRCS += $(PROJ_DIR)/clua.cpp
 SRCS += $(PROJ_DIR)/cluafunc.cpp
+SRCS += $(PROJ_DIR)/cmd.cpp
 
 INC :=
 INC += -I$(PROJ_DIR)

@@ -135,14 +135,19 @@ int CLua::luaRunThread(lua_State *L) {
 
 	std::map<std::string, std::thread*>::iterator pThread=pLua->m_mapLuaThread.find(szBuf);
 	if (pThread == pLua->m_mapLuaThread.end()) {
-		std::thread *t = new std::thread([](lua_State *L, char *func)->void{
+		std::thread *t = new std::thread([](lua_State *L, char *func, CLua *pLua)->void{
 			if (nullptr == L || nullptr == func) return;
 
 			lua_getglobal(L, func);
 			lua_call(L, 0, 0);
-		}, L, szFunc);
 
-		t->detach();
+			std::map<std::string, std::thread*>::iterator pThread=pLua->m_mapLuaThread.find(func);
+			if (pLua->m_mapLuaThread.end() != pThread) {
+				delete pThread->second;
+				pLua->m_mapLuaThread.erase(pThread);
+			}
+		}, L, szFunc, pLua);
+
 		pLua->m_mapLuaThread[szBuf] = t;
 
 	}

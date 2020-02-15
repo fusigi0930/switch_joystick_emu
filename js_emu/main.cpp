@@ -22,7 +22,6 @@
 option long_options[] = {
 	{"server", 1, 0, 's'},
 	{"test", 1, 0, 't'},
-	{"cmd", 1, 0, 'c' },
 	{0, 0, 0, 0},
 };
 
@@ -44,6 +43,19 @@ static void start_server() {
 	::listen(g_sock, 5);
 	g_serverThread = new std::thread([]()->void{
 		// fetch command from network
+		sockaddr_in client = {0};
+		while (-1 != g_sock) {
+			unsigned int leng = sizeof(client);
+			int client_fd = ::accept(g_sock, reinterpret_cast<sockaddr*>(&client), &leng);
+			while (1) {
+				char szBuf[1024] = {0};
+				ssize_t ret = ::recv(client_fd, szBuf, sizeof(szBuf) -1, 0);
+				if (0 >= ret) {
+					break;
+				}
+			}
+			::close(client_fd);
+		}
 	});
 }
 
@@ -73,8 +85,6 @@ int main(int argc, char* argv[]) {
 				lua.setJoyStick(g_js);
 				lua.runString(reinterpret_cast<char*>(optarg));
 			}	break;
-			case 'c':
-				break;
 		}
 	}
 

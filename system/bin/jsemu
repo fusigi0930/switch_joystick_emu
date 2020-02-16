@@ -1,0 +1,27 @@
+#!/bin/bash
+
+CMD_ARG=$1
+DAEMON_PORT=9090
+
+case "$CMD_ARG" in
+start)
+	if [ ! -d /sys/kernel/config/usb_gadget/switch_pro ]; then
+		switch_pro_joystick create
+	else
+		switch_pro_joystick insert
+	fi
+	js_emu --server $DAEMON_PORT
+	;;
+stop)
+	echo quit | nc 127.0.0.1 $DAEMON_PORT
+	sleep 3
+	switch_pro_joystick none
+	;;
+restart)
+	$0 stop
+	sleep 0.5
+	$0 start
+	;;
+esac
+
+exit 0

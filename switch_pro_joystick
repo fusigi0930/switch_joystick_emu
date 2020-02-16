@@ -1,5 +1,12 @@
 #!/bin/bash
 # Reference by https://github.com/milador/XAC-Virtual-Joystick
+# arguments 1:
+#	create: create and insert usb gamepad
+#	none: remove usb gamepad
+#	insert: only insert usb gamepad
+
+SWITCHPRO=switch_pro
+CMD_ARG=$1
 
 function create_dev(){
   ID=$1
@@ -15,45 +22,55 @@ function create_dev(){
   ln -s functions/hid.usb${ID} configs/c.1
 }
 
-SWITCHPRO=switch_pro
+function enable() {
+	if [ "$1" == "1" ]; then
+		ls /sys/class/udc > UDC
+	else
+		echo "" > UDC
+	fi
+}
 
 # Create joystick gadget
 cd /sys/kernel/config/usb_gadget/
 mkdir -p ${SWITCHPRO}
 cd ${SWITCHPRO}
 
-# Define USB specification
-echo 0x0f0d > idVendor
-echo 0x00c1 > idProduct
-echo 0x0572 > bcdDevice            # v1.0.0
-echo 0x0200 > bcdUSB               # USB2
-echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
-echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
-echo 0x00 > bDeviceProtocol        # USB_CSCP_NoDeviceProtocol 0x00
+if [ "$CMD_ARG" == "create"  ]; then
+	# Define USB specification
+	echo 0x0f0d > idVendor
+	echo 0x00c1 > idProduct
+	echo 0x0572 > bcdDevice            # v1.0.0
+	echo 0x0200 > bcdUSB               # USB2
+	echo 0x00 > bDeviceClass           # USB_CSCP_NoDeviceClass 0x00
+	echo 0x00 > bDeviceSubClass        # USB_CSCP_NoDeviceSubclass 0x00
+	echo 0x00 > bDeviceProtocol        # USB_CSCP_NoDeviceProtocol 0x00
 
-# Perform localization
-mkdir -p strings/0x409
+	# Perform localization
+	mkdir -p strings/0x409
 
-echo "" > strings/0x409/serialnumber
-echo "HORI CO.,LTD." > strings/0x409/manufacturer
-echo "HORIPAD S" > strings/0x409/product
+	echo "" > strings/0x409/serialnumber
+	echo "HORI CO.,LTD." > strings/0x409/manufacturer
+	echo "HORIPAD S" > strings/0x409/product
 
-# Create configuration file
-mkdir configs/c.1
-mkdir configs/c.1/strings/0x409
+	# Create configuration file
+	mkdir configs/c.1
+	mkdir configs/c.1/strings/0x409
 
-echo 0x80 > configs/c.1/bmAttributes
-echo 500 > configs/c.1/MaxPower # 200 mA
-echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
+	echo 0x80 > configs/c.1/bmAttributes
+	echo 500 > configs/c.1/MaxPower # 200 mA
+	echo "Switch Pro configuration" > configs/c.1/strings/0x409/configuration
 
-# from cyber-gyro gampad
-#create_dev 0 0 0 160 "050115000904a1018530050105091901290a150025017501950a5500650081020509190b290e150025017501950481027501950281030b01000100a1000b300001000b310001000b320001000b35000100150027ffff0000751095048102c00b39000100150025073500463b0165147504950181020509190f2912150025017501950481027508953481030600ff852109017508953f8103858109027508953f8103850109037508953f9183851009047508953f9183858009057508953f9183858209067508953f9183c0"
-# from cyber-gyro gamepad
-#create_dev 1 0 0 8 "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495012507463b0165140939814265007501950c2501450105091901290c81020600ff750195082501450109018102c0a1027508950846ff0026ff0009029102750895040902b102c0c0"
-#create_dev 2 0 0 3 "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0"
-create_dev 3 0 0 64 "05010905A10115002501350045017501950E05091901290E81029502810105012507463B017504950165140939814265009501810126FF0046FF000930093109320935750895048102750895018101C0"
+	# from cyber-gyro gampad
+	#create_dev 0 0 0 160 "050115000904a1018530050105091901290a150025017501950a5500650081020509190b290e150025017501950481027501950281030b01000100a1000b300001000b310001000b320001000b35000100150027ffff0000751095048102c00b39000100150025073500463b0165147504950181020509190f2912150025017501950481027508953481030600ff852109017508953f8103858109027508953f8103850109037508953f9183851009047508953f9183858009057508953f9183858209067508953f9183c0"
+	# from cyber-gyro gamepad
+	#create_dev 1 0 0 8 "05010904a101a10275089505150026ff00350046ff00093209350930093109008102750495012507463b0165140939814265007501950c2501450105091901290c81020600ff750195082501450109018102c0a1027508950846ff0026ff0009029102750895040902b102c0c0"
+	#create_dev 2 0 0 3 "05010904a101150025013500450175019510050919012910810205012507463b017504950165140939814265009501810126ff0046ff0009300931093209357508950481020600ff0920950181020a212695089102c0"
+	create_dev 3 0 0 64 "05010905A10115002501350045017501950E05091901290E81029502810105012507463B017504950165140939814265009501810126FF0046FF000930093109320935750895048102750895018101C0"
 
-# Activate device
-ls /sys/class/udc > UDC
-
-sleep 1
+	# Activate device
+	enable 1
+elif [ "$CMD_ARG" == "insert" ]; then
+	enable 1
+elif [ "$CMD_ARG" == "none" ]; then
+	enable 0
+fi

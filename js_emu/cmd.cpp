@@ -24,7 +24,7 @@ static std::map<std::string, int> s_mapCmd = {
 	{ CMD_DISCONNECT, VALUE_DISCONNECT},
 };
 
-static int command_parser(std::string &cmd, std::vector<std::string> vtCmd) {
+static int command_parser(std::string &cmd, std::vector<std::string> &vtCmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 	std::stringstream s(cmd);
 	std::string arg;

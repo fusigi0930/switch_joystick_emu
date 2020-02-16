@@ -48,8 +48,8 @@ static void cmdRun() {
 		return;
 	}
 
-	g_runMutex.lock();
 	if (nullptr != g_runThread) {
+		g_runThread->detach();
 		delete g_runThread;
 		g_runThread = nullptr;
 	}
@@ -108,7 +108,7 @@ static void start_server() {
 				g_pCmd->command(szBuf);
 				switch (g_pCmd->getParam(PARAM_CMD)) {
 					default: break;
-					case VALUE_RUN: cmdRun(); break;
+					case VALUE_RUN: g_runMutex.lock(); cmdRun(); break;
 					case VALUE_STOP: cmdStop(); break;
 					case VALUE_DISCONNECT: nDisConn = 1; break;
 					case VALUE_QUIT:
@@ -154,6 +154,8 @@ int main(int argc, char* argv[]) {
 
 	if (nullptr != g_serverThread) {
 		g_serverThread->join();
+		delete g_serverThread;
+		g_serverThread = nullptr;
 	}
 
 	if (nullptr != g_pCmd) {

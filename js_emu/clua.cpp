@@ -9,6 +9,7 @@ CLua::CLua() {
 }
 
 CLua::~CLua() {
+	m_JoyStick = nullptr;
 	close();
 }
 
@@ -70,7 +71,7 @@ void CLua::runFile(std::string szFile) {
 	if (szFile.empty()) return;
 	std::ifstream inFile;
 	inFile.open(szFile);
-	if(inFile.good()) return;
+	if(!inFile.good()) return;
 
 	m_szFile=szFile;
 

@@ -63,7 +63,8 @@ void CCommand::command(std::string cmd) {
 			continue;
 		}
 		setParam(PARAM_CMD, pCmd->second);
-		setAppendParam(PARAM_CMD, szBuf.substr(vtCmd[0].length() + 1));
+		if(vtCmd.size() > 1)
+			setAppendParam(PARAM_CMD, szBuf.substr(vtCmd[0].length() + 1));
 	}
 }
 

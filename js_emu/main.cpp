@@ -66,6 +66,8 @@ static void cmdRun() {
 		std::string szFile = g_pCmd->getAppendParam(PARAM_CMD);
 		g_pLua->runFile(szFile);
 
+		std::cout << "run file finished" << std::endl;
+
 		g_pLua->close();
 		delete g_pLua;
 		g_pLua = nullptr;
@@ -75,7 +77,10 @@ static void cmdRun() {
 }
 
 static void cmdStop() {
-
+	if (nullptr != g_pLua) {
+		std::cout << "send stop event" << std::endl;
+		g_pLua->stop();
+	}
 }
 
 static void start_server() {
@@ -113,6 +118,10 @@ static void start_server() {
 					case VALUE_STOP: cmdStop(); break;
 					case VALUE_DISCONNECT: nDisConn = 1; break;
 					case VALUE_QUIT:
+						if (nullptr != g_pLua) {
+							g_pLua->stop();
+							g_runMutex.lock();
+						}
 						::close(client_fd);
 						::close(g_sock);
 						g_sock = -1;
@@ -142,7 +151,7 @@ int main(int argc, char* argv[]) {
 		switch(c) {
 			default: break;
 			case 's':
-				cout << "starting jsemu server...." << std::endl;
+				std::cout << "starting jsemu server...." << std::endl;
 				g_nPort = std::stoi(reinterpret_cast<char*>(optarg));
 				start_server();
 				break;

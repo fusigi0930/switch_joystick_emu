@@ -9,6 +9,7 @@ extern "C" {
 #include <map>
 #include <vector>
 #include <thread>
+#include <mutex>
 
 #define GLOBAL_LUAOBJ "__LUA_OBJECT__"
 
@@ -26,6 +27,8 @@ protected:
 	std::string m_szFile;
 	std::map<std::string, std::thread*> m_mapLuaThread;
 	void *m_JoyStick;
+	int m_isRunning;
+	std::mutex m_runMutex;
 
 public:
 	CLua();
@@ -38,6 +41,7 @@ public:
 
 	void runString(std::string szScript);
 	void runFile(std::string szFile);
+	void stop();
 	std::string getResult();
 
 	// override original Lua function

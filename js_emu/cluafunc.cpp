@@ -96,6 +96,7 @@ int CLua::luaPrint(lua_State *L) {
 		}
 	}
 
+	std::cout << s.str() << std::endl;
 	if (pLua) {
 		pLua->setResult(s.str());
 	}

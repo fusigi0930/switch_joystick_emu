@@ -1,10 +1,12 @@
 #include "clua.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 CLua::CLua() {
 	mLua = nullptr;
 	m_JoyStick = nullptr;
+	m_isRunning = 0;
 	init();
 }
 
@@ -28,6 +30,13 @@ void CLua::init() {
 }
 
 void CLua::close() {
+	if (1 == m_isRunning) {
+		stop();
+	}
+
+	m_runMutex.lock();
+	m_runMutex.unlock();
+
 	if (mLua) {
 		lua_close(mLua);
 		mLua = nullptr;
@@ -80,9 +89,13 @@ void CLua::runFile(std::string szFile) {
 		return;
 	}
 
-	if (lua_pcall(mLua, 0, LUA_MULTRET, 0)) {
-		return;
-	}
+	m_isRunning = 1;
+	m_runMutex.lock();
+
+	lua_pcall(mLua, 0, LUA_MULTRET, 0);
+
+	m_isRunning = 0;
+	m_runMutex.unlock();
 
 }
 
@@ -90,5 +103,23 @@ void CLua::runString(std::string szScript) {
 	if (nullptr == mLua) return;
 	if (szScript.empty()) return;
 
+	m_isRunning = 1;
+	m_runMutex.lock();
+
 	luaL_dostring(mLua, szScript.c_str());
+
+	m_isRunning = 0;
+	m_runMutex.unlock();
+}
+
+static void hookCode(lua_State *L, lua_Debug *ar) {
+	std::cout << "try to generate error" << std::endl;
+	lua_error(L);
+}
+
+void CLua::stop() {
+	if (nullptr == mLua) return;
+	if (1 == m_isRunning) {
+		lua_sethook(mLua, hookCode, LUA_HOOKLINE, 0);
+	}
 }

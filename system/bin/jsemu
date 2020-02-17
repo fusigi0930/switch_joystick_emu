@@ -10,7 +10,8 @@ start)
 	else
 		switch_pro_joystick insert
 	fi
-	js_emu --server $DAEMON_PORT
+	sleep 2
+	js_emu --server $DAEMON_PORT &
 	;;
 stop)
 	echo quit | nc 127.0.0.1 $DAEMON_PORT

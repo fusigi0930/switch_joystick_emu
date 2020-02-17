@@ -88,6 +88,7 @@ static void start_server() {
 	in.sin_port = htons(g_nPort);
 	::bind(g_sock, reinterpret_cast<sockaddr*>(&in), sizeof(in));
 	::listen(g_sock, 5);
+	std::cout << "starting listen command..." << std::endl;
 	g_pCmd = new CCommand();
 	g_serverThread = new std::thread([]()->void{
 		// fetch command from network
@@ -141,6 +142,7 @@ int main(int argc, char* argv[]) {
 		switch(c) {
 			default: break;
 			case 's':
+				cout << "starting jsemu server...." << std::endl;
 				g_nPort = std::stoi(reinterpret_cast<char*>(optarg));
 				start_server();
 				break;

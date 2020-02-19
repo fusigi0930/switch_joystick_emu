@@ -42,6 +42,14 @@ CLua *g_pLua = nullptr;
 CCommand *g_pCmd = nullptr;
 int g_status = STATUS_NORMAL;
 
+#define RELEASEMEM(e) \
+	{ \
+		if (nullptr != e) { \
+			delete e; \
+			e = nullptr; \
+		} \
+	}
+
 static void cmdRun() {
 	if (STATUS_RUNNING == g_status) {
 		std::cout << "still running script file" << std::endl;
@@ -50,16 +58,13 @@ static void cmdRun() {
 
 	if (nullptr != g_runThread) {
 		g_runThread->detach();
-		delete g_runThread;
-		g_runThread = nullptr;
+		RELEASEMEM(g_runThread);
 	}
 
 	g_status = STATUS_RUNNING;
 	g_runThread = new std::thread([]()->void{
-		if (nullptr != g_pLua) {
-			delete g_pLua;
-			g_pLua = nullptr;
-		}
+		RELEASEMEM(g_pLua);
+
 		g_pLua = new CLua();
 		g_pLua->setJoyStick(g_js);
 
@@ -69,8 +74,7 @@ static void cmdRun() {
 		std::cout << "run file finished" << std::endl;
 
 		g_pLua->close();
-		delete g_pLua;
-		g_pLua = nullptr;
+		RELEASEMEM(g_pLua);
 		g_status = STATUS_NORMAL;
 		g_runMutex.unlock();
 	});
@@ -153,7 +157,16 @@ int main(int argc, char* argv[]) {
 			case 's':
 				std::cout << "starting jsemu server...." << std::endl;
 				g_nPort = std::stoi(reinterpret_cast<char*>(optarg));
+
 				start_server();
+				if (nullptr != g_serverThread) {
+					g_serverThread->join();
+				}
+
+				if (-1 != g_sock) {
+					::close(g_sock);
+					g_sock = -1;
+				}
 				break;
 			case 't': {
 				CLua lua;
@@ -163,31 +176,13 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	if (nullptr != g_serverThread) {
-		g_serverThread->join();
-		delete g_serverThread;
-		g_serverThread = nullptr;
-	}
+	g_js->close();
+	if (nullptr != g_runThread) g_runThread->detach();
+	RELEASEMEM(g_runThread);
+	RELEASEMEM(g_serverThread);
+	RELEASEMEM(g_pCmd);
+	RELEASEMEM(g_pLua);
+	RELEASEMEM(g_js);
 
-	if (nullptr != g_pCmd) {
-		delete g_pCmd;
-		g_pCmd = nullptr;
-	}
-
-	if (nullptr != g_pLua) {
-		delete g_pLua;
-		g_pLua = nullptr;
-	}
-
-	if (-1 != g_sock) {
-		::close(g_sock);
-		g_sock = -1;
-	}
-
-	if (nullptr != g_js) {
-		g_js->close();
-		delete g_js;
-		g_js = nullptr;
-	}
 	return 0;
 }

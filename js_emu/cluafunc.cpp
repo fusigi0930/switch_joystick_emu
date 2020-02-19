@@ -140,10 +140,12 @@ int CLua::luaRunThread(lua_State *L) {
 			if (nullptr == L || nullptr == func) return;
 
 			lua_getglobal(L, func);
-			lua_call(L, 0, 0);
+			lua_pcall(L, 0, 0, 0);
 
+			std::cout << "finish thread function: " << func << std::endl;
 			std::map<std::string, std::thread*>::iterator pThread=pLua->m_mapLuaThread.find(func);
 			if (pLua->m_mapLuaThread.end() != pThread) {
+				pThread->second->detach();
 				delete pThread->second;
 				pLua->m_mapLuaThread.erase(pThread);
 			}

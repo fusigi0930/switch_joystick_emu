@@ -45,9 +45,9 @@ support functions
 *	wait for millisecond
 	+ milliseconds: as title.....
 
-* run_thread(func);
+* run_thread(func_name);
 *	run a lua function as thread
-	+ func: lua function without arguments
+	+ func_name: lua function name without arguments
 
 --]]
 

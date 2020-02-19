@@ -174,6 +174,11 @@ int main(int argc, char* argv[]) {
 		g_pCmd = nullptr;
 	}
 
+	if (nullptr != g_pLua) {
+		delete g_pLua;
+		g_pLua = nullptr;
+	}
+
 	if (-1 != g_sock) {
 		::close(g_sock);
 		g_sock = -1;

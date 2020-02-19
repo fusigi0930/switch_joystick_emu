@@ -37,6 +37,13 @@ void CLua::close() {
 	m_runMutex.lock();
 	m_runMutex.unlock();
 
+	std::map<std::string, std::thread*>::iterator pThread;
+	for (pThread = m_mapLuaThread.begin(); pThread  != m_mapLuaThread.end(); pThread++) {
+		pThread->second->detach();
+		delete pThread->second;
+	}
+	m_mapLuaThread.clear();
+
 	if (mLua) {
 		lua_close(mLua);
 		mLua = nullptr;

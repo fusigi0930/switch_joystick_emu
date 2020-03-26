@@ -31,7 +31,7 @@ after reboot the system, the USB2 and gadget environment shall be setup.
 this project use C++ and lua to build a js_emu daemon to emulate game pad and communicate with nintendo switch, there has 2 method to build the project:
 * building in rpi zero w (preferred)
 ```shell
-cd ~/cd switch_joystick_emu/js_emu
+cd ~/switch_joystick_emu/js_emu
 make
 ```
 
@@ -41,7 +41,7 @@ make
 ### setup to your system
 copy files to your system:
 ```shell
-cd ~/cd switch_joystick_emu
+cd ~/switch_joystick_emu
 sudo cp system/bin/switch_pro_joystick /usr/bin
 sudo cp system/bin/jsemu /usr/bin
 sudo cp js_emu/build/out /usr/bin

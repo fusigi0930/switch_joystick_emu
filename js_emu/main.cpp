@@ -88,10 +88,10 @@ static void cmdStop() {
 }
 
 static void cmdAction() {
-	if (nullptr != g_pLua) {
-		std::string szCmd = g_pCmd->getAppendParam(PARAM_CMD);
-		g_pLua->runString(szCmd.c_str());
-	}
+	CLua lua;
+	lua.setJoyStick(g_js);
+	std::string szCmd = g_pCmd->getAppendParam(PARAM_CMD);
+	lua.runString(szCmd.c_str());
 }
 
 static void start_server() {

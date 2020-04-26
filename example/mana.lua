@@ -1,14 +1,16 @@
 
 function run_circle(time)
 	delay = math.floor(time / 360)
-	for degree=0,359 do
-		x = math.floor(126 * math.cos(math.rad(degree)))
-		y = math.floor(126 * math.sin(math.rad(degree)))
-		wait(delay)
-		js_analog(x,y, 0, 0)
+	while true do
+		for degree=0,359 do
+			x = math.floor(126 * math.cos(math.rad(degree)))
+			y = math.floor(126 * math.sin(math.rad(degree)))
+			wait(delay)
+			js_analog(x,y, 0, 0)
+		end
+		js_analog(0, 0, 0, 0)
+		wait(500)
 	end
-	js_analog(0, 0, 0, 0)
-	wait(500)
 end
 
 function press_button(buttons)
@@ -27,9 +29,7 @@ function attack()
 end
 
 function running_thread()
-	while true do
-		run_circle(8000)
-	end
+	run_circle(5000)
 end
 
 run_thread("running_thread")

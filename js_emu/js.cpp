@@ -41,7 +41,11 @@ void CJoyStick::setDev(std::string dev) {
 int CJoyStick::sendReport() {
 	if (-1 == m_nfd) return 0;
 
-	return static_cast<int>(::write(m_nfd, m_vtReportData.data(), m_vtReportData.capacity()));
+	m_sendMutex.lock();
+	int ret = static_cast<int>(::write(m_nfd, m_vtReportData.data(), m_vtReportData.capacity()));
+	m_sendMutex.unlock();
+
+	return ret;
 }
 
 void CJoyStick::resetData() {

@@ -4,12 +4,14 @@
 #include "js_def.h"
 #include <vector>
 #include <string>
+#include <mutex>
 
 class CJoyStick {
 protected:
 	std::vector<uint8_t> m_vtReportData;
 	std::string m_szDev;
 	int m_nfd;
+	std::mutex m_sendMutex;
 
 public:
 	CJoyStick();

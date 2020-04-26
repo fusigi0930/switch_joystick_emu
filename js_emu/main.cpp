@@ -87,6 +87,13 @@ static void cmdStop() {
 	}
 }
 
+static void cmdAction() {
+	if (nullptr != g_pLua) {
+		std::string szCmd = g_pCmd->getAppendParam(PARAM_CMD);
+		g_pLua->runString(szCmd.c_str());
+	}
+}
+
 static void start_server() {
 	g_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (-1 == g_sock) return;
@@ -121,6 +128,7 @@ static void start_server() {
 					case VALUE_RUN: g_runMutex.lock(); cmdRun(); break;
 					case VALUE_STOP: cmdStop(); break;
 					case VALUE_DISCONNECT: nDisConn = 1; break;
+					case VALUE_ACTION: cmdAction(); break;
 					case VALUE_QUIT:
 						if (nullptr != g_pLua) {
 							g_pLua->stop();

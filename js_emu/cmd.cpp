@@ -15,6 +15,7 @@ CCommand::~CCommand() {
 #define CMD_STOP			"stop"
 #define CMD_QUIT			"quit"
 #define CMD_DISCONNECT		"disconnect"
+#define CMD_ACTION			"act"
 
 static std::map<std::string, int> s_mapCmd = {
 	{ CMD_RUN,		VALUE_RUN },
@@ -22,6 +23,7 @@ static std::map<std::string, int> s_mapCmd = {
 	{ CMD_STOP,		VALUE_STOP },
 	{ CMD_QUIT,		VALUE_QUIT },
 	{ CMD_DISCONNECT, VALUE_DISCONNECT},
+	{ CMD_ACTION,	VALUE_ACTION },
 };
 
 static int command_parser(std::string &cmd, std::vector<std::string> &vtCmd) {

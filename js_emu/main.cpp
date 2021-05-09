@@ -35,8 +35,11 @@ CJoyStick *g_js = nullptr;
 
 int g_nPort = 0;
 int g_sock = -1;
+int g_pc_xfer_sock = -1;
+
 std::thread *g_serverThread = nullptr;
 std::thread *g_runThread = nullptr;
+std::thread *g_pcXferThread = nullptr;
 std::mutex g_runMutex;
 CLua *g_pLua = nullptr;
 CCommand *g_pCmd = nullptr;
@@ -145,6 +148,43 @@ static void start_server() {
 	});
 }
 
+static void startPcXferServer() {
+	g_pc_xfer_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (-1 == g_pc_xfer_sock) return;
+
+	sockaddr_in in = {0};
+	in.sin_family = PF_INET;
+	in.sin_addr.s_addr = INADDR_ANY;
+	in.sin_port = htons(QT_APP_TRANS_PORT);
+	::bind(g_pc_xfer_sock, reinterpret_cast<sockaddr*>(&in), sizeof(in));
+	::listen(g_pc_xfer_sock, 1);
+	std::cout << "starting listen xfer data..." << std::endl;
+
+	g_pcXferThread = new std::thread([]()->void{
+		// fetch command from network
+		sockaddr_in client = {0};
+		while (-1 != g_pc_xfer_sock) {
+			unsigned int leng = sizeof(client);
+			int client_fd = ::accept(g_pc_xfer_sock, reinterpret_cast<sockaddr*>(&client), &leng);
+			int nDisConn = 0;
+
+			while (0 == nDisConn) {
+				char szBuf[20] = {0};
+				ssize_t ret = ::recv(client_fd, szBuf, sizeof(szBuf), 0);
+				if (0 >= ret) {
+					break;
+				}
+
+				// xfer data to switch~
+				if (nullptr != g_js) {
+					g_js->xferData(szBuf, REPORT_LENG);
+				}
+			}
+			::close(client_fd);
+		}
+	});
+}
+
 int main(int argc, char* argv[]) {
 	g_js = new CJoyStick(JS_DEV);
 
@@ -155,6 +195,9 @@ int main(int argc, char* argv[]) {
 	g_js->init();
 	g_js->resetJoyStick();
 	g_js->resetData();
+
+	startPcXferServer();
+
 	int c, index;
 	while (1) {
 		c = getopt_long(argc, argv, SOPS, long_options, &index);
@@ -188,6 +231,7 @@ int main(int argc, char* argv[]) {
 	if (nullptr != g_runThread) g_runThread->detach();
 	RELEASEMEM(g_runThread);
 	RELEASEMEM(g_serverThread);
+	RELEASEMEM(g_pcXferThread);
 	RELEASEMEM(g_pCmd);
 	RELEASEMEM(g_pLua);
 	RELEASEMEM(g_js);

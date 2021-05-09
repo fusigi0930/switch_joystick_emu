@@ -20,6 +20,7 @@ public:
 	virtual ~CJoyStick();
 
 	void setDev(std::string dev);
+	void xferData(char *data, int leng);
 
 	virtual void init();
 	virtual void resetJoyStick();

@@ -27,6 +27,12 @@ void CJoyStick::init() {
 	}
 }
 
+void CJoyStick::xferData(char *data, int leng) {
+	if (-1 != m_nfd) {
+		::write(m_nfd, data, leng);
+	}
+}
+
 void CJoyStick::close() {
 	if (-1 != m_nfd) {
 		::close(m_nfd);

@@ -1,6 +1,8 @@
 #ifndef __JS_DEF_H__
 #define __JS_DEF_H__
 
+#define QT_APP_TRANS_PORT               58034
+
 #define REPORT_LENG	8
 #define AAXIS_NO_CHANGE 0x8000000
 

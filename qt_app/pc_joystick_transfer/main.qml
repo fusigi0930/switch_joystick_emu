@@ -52,6 +52,8 @@ ApplicationWindow {
                 anchors.fill:parent
                 font.pixelSize: 20
                 font.family: "tohama"
+                focus: true
+                onTextChanged: rpi_joy_emu.setIp(text)
             }
         }
     }

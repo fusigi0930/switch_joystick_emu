@@ -4,6 +4,7 @@
 #include <QLoggingCategory>
 #include <iostream>
 #include <chrono>
+#include <QTcpSocket>
 
 #include <QDebug>
 
@@ -226,11 +227,10 @@ bool CRpiJoyEmu::init() {
     return true;
 }
 
-void CRpiJoyEmu::sendEmuData() {
+void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
     m_mutex.lock();
-    static int count = 0;
-    qDebug("%d, send data", count++);
-    DUMP_JSEMU;
+
+    socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
 
     m_mutex.unlock();
 }
@@ -243,14 +243,28 @@ void CRpiJoyEmu::start() {
         if (nullptr == joyemu)
             return;
 
-        qDebug("start sending thread\n");
+        if (joyemu->m_ipAddr.isEmpty()) {
+            qDebug("ip addr is null");
+            return;
+        }
 
+        QTcpSocket socket;
+
+        socket.connectToHost(joyemu->m_ipAddr, QT_APP_TRANS_PORT);
+        if (!socket.waitForConnected()) {
+            qDebug("connect to host timout");
+            return;
+        }
+
+        qDebug("start sending thread\n");
         while (false == joyemu->m_quitThread) {
             std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION));
-            joyemu->sendEmuData();
+            joyemu->sendEmuData(socket);
         }
 
         qDebug("quit sending thread\n");
+        socket.close();
+
     }, this);
 }
 
@@ -265,4 +279,8 @@ void CRpiJoyEmu::stop() {
         m_quitThread = false;
         m_mutex.lock();
     }
+}
+
+void CRpiJoyEmu::setIp(QString ip) {
+    m_ipAddr = ip;
 }

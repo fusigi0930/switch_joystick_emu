@@ -2,6 +2,7 @@
 #define CRPIJOYEMU_H
 
 #include <QObject>
+#include <QTcpSocket>
 #include "js_def.h"
 
 #include <thread>
@@ -23,6 +24,7 @@ class CRpiJoyEmu : public QObject
     std::thread *m_thread;
     std::mutex m_mutex;
     bool m_quitThread;
+    QString m_ipAddr;
 
 public:
     explicit CRpiJoyEmu(QObject *parent = nullptr);
@@ -31,7 +33,7 @@ public:
     void axis(int val);
     void aaxis(double lx, double ly, double rx, double ry);
     void resetReportData();
-    void sendEmuData();
+    void sendEmuData(QTcpSocket &socket);
 
 signals:
 
@@ -39,6 +41,7 @@ public slots:
     bool init();
     void start();
     void stop();
+    void setIp(QString ip);
 
     void slotButtonUp(bool press);
     void slotButtonDown(bool press);

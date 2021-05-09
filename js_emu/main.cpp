@@ -36,6 +36,7 @@ CJoyStick *g_js = nullptr;
 int g_nPort = 0;
 int g_sock = -1;
 int g_pc_xfer_sock = -1;
+int g_nDisConn = 0;
 
 std::thread *g_serverThread = nullptr;
 std::thread *g_runThread = nullptr;
@@ -115,9 +116,8 @@ static void start_server() {
 		while (-1 != g_sock) {
 			unsigned int leng = sizeof(client);
 			int client_fd = ::accept(g_sock, reinterpret_cast<sockaddr*>(&client), &leng);
-			int nDisConn = 0;
 
-			while (0 == nDisConn) {
+			while (0 == g_nDisConn) {
 				char szBuf[1024] = {0};
 				ssize_t ret = ::recv(client_fd, szBuf, sizeof(szBuf) -1, 0);
 				if (0 >= ret) {
@@ -130,7 +130,7 @@ static void start_server() {
 					default: break;
 					case VALUE_RUN: g_runMutex.lock(); cmdRun(); break;
 					case VALUE_STOP: cmdStop(); break;
-					case VALUE_DISCONNECT: nDisConn = 1; break;
+					case VALUE_DISCONNECT: g_nDisConn = 1; break;
 					case VALUE_ACTION: cmdAction(); break;
 					case VALUE_QUIT:
 						if (nullptr != g_pLua) {
@@ -166,9 +166,8 @@ static void startPcXferServer() {
 		while (-1 != g_pc_xfer_sock) {
 			unsigned int leng = sizeof(client);
 			int client_fd = ::accept(g_pc_xfer_sock, reinterpret_cast<sockaddr*>(&client), &leng);
-			int nDisConn = 0;
 
-			while (0 == nDisConn) {
+			while (0 == g_nDisConn) {
 				char szBuf[20] = {0};
 				ssize_t ret = ::recv(client_fd, szBuf, sizeof(szBuf), 0);
 				if (0 >= ret) {
@@ -196,8 +195,6 @@ int main(int argc, char* argv[]) {
 	g_js->resetJoyStick();
 	g_js->resetData();
 
-	startPcXferServer();
-
 	int c, index;
 	while (1) {
 		c = getopt_long(argc, argv, SOPS, long_options, &index);
@@ -209,14 +206,24 @@ int main(int argc, char* argv[]) {
 				std::cout << "starting jsemu server...." << std::endl;
 				g_nPort = std::stoi(reinterpret_cast<char*>(optarg));
 
+				startPcXferServer();
 				start_server();
 				if (nullptr != g_serverThread) {
 					g_serverThread->join();
 				}
 
+				if (nullptr != g_pcXferThread) {
+					g_pcXferThread->join();
+				}
+
 				if (-1 != g_sock) {
 					::close(g_sock);
 					g_sock = -1;
+				}
+
+				if (-1 != g_pc_xfer_sock) {
+					::close(g_pc_xfer_sock);
+					g_pc_xfer_sock = -1;
 				}
 				break;
 			case 't': {

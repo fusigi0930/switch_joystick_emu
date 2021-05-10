@@ -209,10 +209,10 @@ bool CRpiJoyEmu::init() {
     connect(m_gamdpad, &QGamepad::axisLeftYChanged, this, &CRpiJoyEmu::slotAxisLY);
     connect(m_gamdpad, &QGamepad::axisRightXChanged, this, &CRpiJoyEmu::slotAxisRX);
     connect(m_gamdpad, &QGamepad::axisRightYChanged, this, &CRpiJoyEmu::slotAxisRY);
-    connect(m_gamdpad, &QGamepad::buttonAChanged, this, &CRpiJoyEmu::slotButtonA);
-    connect(m_gamdpad, &QGamepad::buttonBChanged, this, &CRpiJoyEmu::slotButtonB);
-    connect(m_gamdpad, &QGamepad::buttonXChanged, this, &CRpiJoyEmu::slotButtonX);
-    connect(m_gamdpad, &QGamepad::buttonYChanged, this, &CRpiJoyEmu::slotButtonY);
+    connect(m_gamdpad, &QGamepad::buttonAChanged, this, &CRpiJoyEmu::slotButtonB);
+    connect(m_gamdpad, &QGamepad::buttonBChanged, this, &CRpiJoyEmu::slotButtonA);
+    connect(m_gamdpad, &QGamepad::buttonXChanged, this, &CRpiJoyEmu::slotButtonY);
+    connect(m_gamdpad, &QGamepad::buttonYChanged, this, &CRpiJoyEmu::slotButtonX);
     connect(m_gamdpad, &QGamepad::buttonL1Changed, this, &CRpiJoyEmu::slotButtonL);
     connect(m_gamdpad, &QGamepad::buttonR1Changed, this, &CRpiJoyEmu::slotButtonR);
     connect(m_gamdpad, &QGamepad::buttonL2Changed, this, &CRpiJoyEmu::slotButtonZL);
@@ -231,6 +231,7 @@ void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
     m_mutex.lock();
 
     socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
+    socket.flush();
 
     m_mutex.unlock();
 }

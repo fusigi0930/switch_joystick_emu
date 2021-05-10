@@ -18,7 +18,7 @@
         v == true ? (d |= (1 << a)) : (d &= ~(1 << a)) \
     )
 
-#define FLOAT_TO_AAXIS(v) static_cast<uint8_t>(v * 126.0)
+#define FLOAT_TO_AAXIS(v) static_cast<int8_t>(v * 126.0)
 
 #define DUMP_JSEMU qDebug("%02x %02x %02x %02x %02x %02x %02x %02x", \
     m_jsemuData[0], m_jsemuData[1], m_jsemuData[2], m_jsemuData[3], \

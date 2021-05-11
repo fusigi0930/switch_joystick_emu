@@ -33,13 +33,13 @@ ApplicationWindow {
                 iconSource: "image/res/png/gamepad.png"
                 onSigClicked: {
                     if (iconSource == "qrc:/image/res/png/gamepad.png") {
-                        //rpi_joy_emu.start()
+                        rpi_joy_emu.start()
                         iconSource = "image/res/png/gamepad-stop.png"
                         buttonText = "Stop"
                         labelText = "Stop"
                     }
                     else {
-                        //rpi_joy_emu.stop()
+                        rpi_joy_emu.stop()
                         iconSource = "image/res/png/gamepad.png"
                         buttonText = "Start"
                         labelText = "Start"

@@ -2,4 +2,14 @@
     <qresource prefix="/">
         <file>main.qml</file>
     </qresource>
+    <qresource prefix="/modules">
+        <file>invi_toolbutton.qml</file>
+        <file>qmldir</file>
+    </qresource>
+    <qresource prefix="/image">
+        <file>res/png/gamepad.png</file>
+		<file>res/png/gamepad-stop.png</file>
+		<file>res/png/record.png</file>
+		<file>res/png/record-stop.png</file>
+    </qresource>
 </RCC>

@@ -1,13 +1,15 @@
 import QtQuick.Window 2.12
 import QtQuick 2.2
 import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.3
+import "qrc:/modules/"
 
 import RpiJoyEmu 1.0
 
 ApplicationWindow {
     visible: true
-    width: screen.width * 2 /3
-    height: 250
+    width: screen.width / 3
+    height: 130
     title: "pc-rpi-joystick-emu transfer"
     objectName: "rpi-joystick-emu-main"
 
@@ -20,19 +22,68 @@ ApplicationWindow {
         rpi_joy_emu.init()
     }
 
+    header: ToolBar {
+            RowLayout {
+            InviToolButton {
+                id: buttonTransfer
+                width: 56
+                height: 56
+                buttonText: "Start"
+                labelText: "Start"
+                iconSource: "image/res/png/gamepad.png"
+                onSigClicked: {
+                    if (iconSource == "qrc:/image/res/png/gamepad.png") {
+                        //rpi_joy_emu.start()
+                        iconSource = "image/res/png/gamepad-stop.png"
+                        buttonText = "Stop"
+                        labelText = "Stop"
+                    }
+                    else {
+                        //rpi_joy_emu.stop()
+                        iconSource = "image/res/png/gamepad.png"
+                        buttonText = "Start"
+                        labelText = "Start"
+                    }
+                }
+            }
+            InviToolButton {
+                id: buttonRecord
+                width: 56
+                height: 56
+                buttonText: "Record"
+                labelText: "Record"
+                iconSource: "image/res/png/record.png"
+                onSigClicked: {
+                    if (iconSource == "qrc:/image/res/png/record.png") {
+
+                        iconSource = "image/res/png/record-stop.png"
+                        buttonText = "Stop"
+                        labelText = "Stop"
+                    }
+                    else {
+
+                        iconSource = "image/res/png/record.png"
+                        buttonText = "Record"
+                        labelText = "Record"
+                    }
+                }
+            }
+        }
+    }
+
     Rectangle {
         id: rectInfoArea
         x: 10
         y: 10
         width: parent.width - 20
-        height: 35
+        height: 20
 
         Text {
             id: labelRpiIp
             height: 28
             font.pixelSize: height - 5
             font.family: "tohama"
-            text: "Raspberry pi joy emulator ip addr:"
+            text: "Rpi joy emu ip addr:"
         }
         Rectangle {
             anchors.left: labelRpiIp.right
@@ -47,42 +98,15 @@ ApplicationWindow {
             border.color: "#8080ff"
             visible: true
 
-            TextInput {
+            TextField {
                 id: textRpiIp
+                leftPadding: 10
                 anchors.fill:parent
-                font.pixelSize: 20
+                font.pixelSize: 16
                 font.family: "tohama"
                 focus: true
                 onTextChanged: rpi_joy_emu.setIp(text)
             }
-        }
-    }
-    Rectangle {
-        id: rectButtonArea
-        width: rectInfoArea.width
-        height: 35
-        anchors.top: rectInfoArea.bottom
-        anchors.topMargin: 5
-        anchors.left: rectInfoArea.left
-
-        Button {
-            id: buttonStart
-            x: 5
-            y: 5
-            width: 50
-            height: 30
-            text: "Start"
-            onClicked: rpi_joy_emu.start()
-        }
-
-        Button {
-            id: buttonStop
-            x: buttonStart.width + buttonStart.x + 5
-            y: 5
-            width: 50
-            height: 30
-            text: "Stop"
-            onClicked: rpi_joy_emu.stop()
         }
     }
 

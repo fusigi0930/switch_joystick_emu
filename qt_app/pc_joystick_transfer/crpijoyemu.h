@@ -34,6 +34,12 @@ class CRpiJoyEmu : public QObject
     bool m_bRecordJSEvent;
     std::vector<SRecordEvent> m_vtRecordData;
 
+    QString m_szEventFile;
+    bool m_bQuitEventThread;
+    std::thread *m_threadRunEvent;
+
+    QTcpSocket m_socket;
+
 public:
     explicit CRpiJoyEmu(QObject *parent = nullptr);
     virtual ~CRpiJoyEmu();
@@ -41,7 +47,7 @@ public:
     void axis(int val);
     void aaxis(double lx, double ly, double rx, double ry);
     void resetReportData();
-    void sendEmuData(QTcpSocket &socket);
+    void sendEmuData();
 
 signals:
 
@@ -51,6 +57,8 @@ public slots:
     void stop();
     void setIp(QString ip);
     void setRecord(bool enable);
+    void runEvents(QString szFile);
+    void stopRunEvent();
 
     void slotButtonUp(bool press);
     void slotButtonDown(bool press);

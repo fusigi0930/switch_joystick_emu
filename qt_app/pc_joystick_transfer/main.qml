@@ -38,11 +38,14 @@ ApplicationWindow {
                         buttonText = "Stop"
                         labelText = "Stop"
                         buttonRecord.enabled = true
+                        buttonRunEvent.enabled = true
                     }
                     else {
                         rpi_joy_emu.stop()
                         rpi_joy_emu.setRecord(false)
+                        rpi_joy_emu.stopRunEvent()
                         buttonRecord.enabled = false
+                        buttonRunEvent.enabled = false
                         iconSource = "image/res/png/gamepad.png"
                         buttonText = "Start"
                         labelText = "Start"
@@ -69,6 +72,30 @@ ApplicationWindow {
                         iconSource = "image/res/png/record.png"
                         buttonText = "Record"
                         labelText = "Record"
+                    }
+                }
+            }
+            InviToolButton {
+                id: buttonRunEvent
+                enabled: false
+                width: 56
+                height: 56
+                buttonText: "Run Event"
+                labelText: "Run Event"
+                iconSource: "image/res/png/run.png"
+                onSigClicked: {
+                    console.log("run event")
+                    if (iconSource == "qrc:/image/res/png/run.png") {
+                        rpi_joy_emu.runEvents("record.bin")
+                        iconSource = "image/res/png/standing.png"
+                        buttonText = "Terminate"
+                        labelText = "Terminate"
+                    }
+                    else {
+                        rpi_joy_emu.stopRunEvent()
+                        iconSource = "image/res/png/run.png"
+                        buttonText = "Run Event"
+                        labelText = "Run Event"
                     }
                 }
             }

@@ -38,10 +38,14 @@ CRpiJoyEmu::CRpiJoyEmu(QObject *parent) : QObject(parent) {
     m_thread = nullptr;
     m_quitThread = false;
     m_bRecordJSEvent = false;
+    m_bQuitEventThread = false;
+    m_szEventFile.clear();
+    m_threadRunEvent = nullptr;
 }
 
 CRpiJoyEmu::~CRpiJoyEmu() {
     stop();
+    stopRunEvent();
 
     if (nullptr != m_gamdpad) {
         delete m_gamdpad;
@@ -229,18 +233,18 @@ bool CRpiJoyEmu::init() {
     return true;
 }
 
-void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
+void CRpiJoyEmu::sendEmuData() {
     m_mutex.lock();
 
     if (m_bRecordJSEvent) {
         SRecordEvent event;
-        event.time = static_cast<uint64_t>(std::chrono::steady_clock::now().time_since_epoch().count()) / 1000;
+        event.time = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         memcpy(event.data, m_jsemuData, sizeof(m_jsemuData));
         m_vtRecordData.push_back(event);
     }
 
-    socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
-    socket.flush();
+    m_socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
+    m_socket.flush();
 
     m_mutex.unlock();
 }
@@ -248,6 +252,8 @@ void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
 void CRpiJoyEmu::start() {
     if (nullptr != m_thread)
         return;
+
+    m_socket.connectToHost(m_ipAddr, QT_APP_TRANS_PORT);
 
     m_thread = new std::thread([](CRpiJoyEmu *joyemu)->void {
         if (nullptr == joyemu)
@@ -258,10 +264,7 @@ void CRpiJoyEmu::start() {
             return;
         }
 
-        QTcpSocket socket;
-
-        socket.connectToHost(joyemu->m_ipAddr, QT_APP_TRANS_PORT);
-        if (!socket.waitForConnected()) {
+        if (!joyemu->m_socket.waitForConnected()) {
             qDebug("connect to host timout");
             return;
         }
@@ -269,11 +272,11 @@ void CRpiJoyEmu::start() {
         qDebug("start sending thread\n");
         while (false == joyemu->m_quitThread) {
             std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION));
-            joyemu->sendEmuData(socket);
+            joyemu->sendEmuData();
         }
 
         qDebug("quit sending thread\n");
-        socket.close();
+        joyemu->m_socket.close();
 
     }, this);
 }
@@ -308,5 +311,68 @@ void CRpiJoyEmu::setRecord(bool enable) {
             file.flush();
             file.close();
         }
+    }
+}
+
+void CRpiJoyEmu::runEvents(QString szFile) {
+    if (nullptr != m_threadRunEvent)
+        return;
+
+    if (szFile.isEmpty())
+        return;
+
+    if (!QFile::exists(szFile))
+        return;
+
+    m_szEventFile = szFile;
+
+    m_threadRunEvent = new std::thread([](CRpiJoyEmu *joyemu)->void {
+        QFile file(joyemu->m_szEventFile);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug("open file error");
+            return;
+        }
+        size_t leng = static_cast<size_t>(file.size());
+        uint8_t *buff = new uint8_t[leng];
+
+        file.read(reinterpret_cast<char*>(buff), leng);
+        file.close();
+        SRecordEvent *event = reinterpret_cast<SRecordEvent *>(buff);
+        uint8_t *end_buff = buff + leng;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+        while (false == joyemu->m_bQuitEventThread) {
+            if (reinterpret_cast<size_t>(event) >= reinterpret_cast<size_t>(end_buff)) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                event = reinterpret_cast<SRecordEvent *>(buff);
+            }
+
+            SRecordEvent *next = event + 1;
+            if (reinterpret_cast<size_t>(next) >= reinterpret_cast<size_t>(end_buff)) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION * 10));
+            }
+            else {
+                qDebug("delay %d ms", next->time - event->time);
+                std::this_thread::sleep_for(std::chrono::milliseconds(next->time - event->time));
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds());
+            joyemu->m_socket.write(reinterpret_cast<char*>(event->data), sizeof(m_jsemuData));
+            joyemu->m_socket.flush();
+            event++;
+        }
+
+        delete [] buff;
+
+    }, this);
+}
+
+void CRpiJoyEmu::stopRunEvent() {
+    if (nullptr != m_threadRunEvent) {
+        m_bQuitEventThread = true;
+        m_threadRunEvent->join();
+        delete m_threadRunEvent;
+        m_threadRunEvent = nullptr;
+        m_bQuitEventThread = false;
     }
 }

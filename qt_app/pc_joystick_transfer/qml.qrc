@@ -11,5 +11,7 @@
 		<file>res/png/gamepad-stop.png</file>
 		<file>res/png/record.png</file>
 		<file>res/png/record-stop.png</file>
+		<file>res/png/run.png</file>
+		<file>res/png/standing.png</file>
     </qresource>
 </RCC>

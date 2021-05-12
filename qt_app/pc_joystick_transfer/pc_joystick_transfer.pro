@@ -1,4 +1,4 @@
-QT += quick gamepad network
+QT += quick gamepad network core
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use

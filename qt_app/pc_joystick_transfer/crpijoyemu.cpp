@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <QTcpSocket>
+#include <QFile>
 
 #include <QDebug>
 
@@ -36,6 +37,7 @@ CRpiJoyEmu::CRpiJoyEmu(QObject *parent) : QObject(parent) {
     m_lx = m_ly = m_rx = m_ry = 0.0;
     m_thread = nullptr;
     m_quitThread = false;
+    m_bRecordJSEvent = false;
 }
 
 CRpiJoyEmu::~CRpiJoyEmu() {
@@ -230,6 +232,13 @@ bool CRpiJoyEmu::init() {
 void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
     m_mutex.lock();
 
+    if (m_bRecordJSEvent) {
+        SRecordEvent event;
+        event.time = static_cast<uint64_t>(std::chrono::steady_clock::now().time_since_epoch().count()) / 1000;
+        memcpy(event.data, m_jsemuData, sizeof(m_jsemuData));
+        m_vtRecordData.push_back(event);
+    }
+
     socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
     socket.flush();
 
@@ -284,4 +293,19 @@ void CRpiJoyEmu::stop() {
 
 void CRpiJoyEmu::setIp(QString ip) {
     m_ipAddr = ip;
+}
+
+void CRpiJoyEmu::setRecord(bool enable) {
+    m_bRecordJSEvent = enable;
+    if (enable) {
+        m_vtRecordData.clear();
+    }
+    else {
+        QFile file("record.bin");
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Unbuffered)) {
+            file.write(reinterpret_cast<char*>(&m_vtRecordData[0]), m_vtRecordData.size() * sizeof(SRecordEvent));
+            file.flush();
+            file.close();
+        }
+    }
 }

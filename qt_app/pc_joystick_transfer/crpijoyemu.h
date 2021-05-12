@@ -7,10 +7,16 @@
 
 #include <thread>
 #include <mutex>
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 class QGamepad;
 QT_END_NAMESPACE
+
+struct SRecordEvent {
+    uint64_t time;
+    uint8_t data[REPORT_LENG];
+};
 
 class CRpiJoyEmu : public QObject
 {
@@ -25,6 +31,8 @@ class CRpiJoyEmu : public QObject
     std::mutex m_mutex;
     bool m_quitThread;
     QString m_ipAddr;
+    bool m_bRecordJSEvent;
+    std::vector<SRecordEvent> m_vtRecordData;
 
 public:
     explicit CRpiJoyEmu(QObject *parent = nullptr);
@@ -42,6 +50,7 @@ public slots:
     void start();
     void stop();
     void setIp(QString ip);
+    void setRecord(bool enable);
 
     void slotButtonUp(bool press);
     void slotButtonDown(bool press);

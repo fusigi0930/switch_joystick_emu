@@ -55,13 +55,13 @@ ApplicationWindow {
                 iconSource: "image/res/png/record.png"
                 onSigClicked: {
                     if (iconSource == "qrc:/image/res/png/record.png") {
-
+                        rpi_joy_emu.setRecord(true)
                         iconSource = "image/res/png/record-stop.png"
                         buttonText = "Stop"
                         labelText = "Stop"
                     }
                     else {
-
+                        rpi_joy_emu.setRecord(false)
                         iconSource = "image/res/png/record.png"
                         buttonText = "Record"
                         labelText = "Record"

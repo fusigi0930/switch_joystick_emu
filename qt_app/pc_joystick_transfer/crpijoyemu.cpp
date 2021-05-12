@@ -296,11 +296,12 @@ void CRpiJoyEmu::setIp(QString ip) {
 }
 
 void CRpiJoyEmu::setRecord(bool enable) {
+    bool bOri = m_bRecordJSEvent;
     m_bRecordJSEvent = enable;
     if (enable) {
         m_vtRecordData.clear();
     }
-    else {
+    else if (true == bOri && false == enable) {
         QFile file("record.bin");
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Unbuffered)) {
             file.write(reinterpret_cast<char*>(&m_vtRecordData[0]), m_vtRecordData.size() * sizeof(SRecordEvent));

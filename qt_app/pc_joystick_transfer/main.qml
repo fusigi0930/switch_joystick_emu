@@ -37,9 +37,12 @@ ApplicationWindow {
                         iconSource = "image/res/png/gamepad-stop.png"
                         buttonText = "Stop"
                         labelText = "Stop"
+                        buttonRecord.enabled = true
                     }
                     else {
                         rpi_joy_emu.stop()
+                        rpi_joy_emu.setRecord(false)
+                        buttonRecord.enabled = false
                         iconSource = "image/res/png/gamepad.png"
                         buttonText = "Start"
                         labelText = "Start"
@@ -48,6 +51,7 @@ ApplicationWindow {
             }
             InviToolButton {
                 id: buttonRecord
+                enabled: false
                 width: 56
                 height: 56
                 buttonText: "Record"

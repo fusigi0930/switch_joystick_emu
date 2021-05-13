@@ -84,7 +84,6 @@ ApplicationWindow {
                 labelText: "Run Event"
                 iconSource: "image/res/png/run.png"
                 onSigClicked: {
-                    console.log("run event")
                     if (iconSource == "qrc:/image/res/png/run.png") {
                         rpi_joy_emu.runEvents("record.bin")
                         iconSource = "image/res/png/standing.png"

@@ -14,7 +14,7 @@ class QGamepad;
 QT_END_NAMESPACE
 
 struct SRecordEvent {
-    uint64_t time;
+    //uint64_t time;
     uint8_t data[REPORT_LENG];
 };
 
@@ -38,8 +38,6 @@ class CRpiJoyEmu : public QObject
     bool m_bQuitEventThread;
     std::thread *m_threadRunEvent;
 
-    QTcpSocket m_socket;
-
 public:
     explicit CRpiJoyEmu(QObject *parent = nullptr);
     virtual ~CRpiJoyEmu();
@@ -47,7 +45,7 @@ public:
     void axis(int val);
     void aaxis(double lx, double ly, double rx, double ry);
     void resetReportData();
-    void sendEmuData();
+    void sendEmuData(QTcpSocket &socket);
 
 signals:
 

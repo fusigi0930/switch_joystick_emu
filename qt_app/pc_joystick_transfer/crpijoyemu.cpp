@@ -31,7 +31,7 @@
 //    std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION)); \
 //    m_mutex.lock();
 
-#define SYNC_DATA
+#define SYNC_DATA std::this_thread::sleep_for(std::chrono::milliseconds(1))
 
 CRpiJoyEmu::CRpiJoyEmu(QObject *parent) : QObject(parent) {
     m_gamdpad = nullptr;
@@ -167,13 +167,13 @@ void CRpiJoyEmu::slotButtonR(bool press) {
 }
 
 void CRpiJoyEmu::slotButtonZL(double value) {
-    0.4 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZL) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZL);
+    0.6 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZL) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZL);
 
     SYNC_DATA;
 }
 
 void CRpiJoyEmu::slotButtonZR(double value) {
-    0.4 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZR) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZR);
+    0.6 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZR) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZR);
 
     SYNC_DATA;
 }

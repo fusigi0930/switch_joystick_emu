@@ -44,11 +44,7 @@ ApplicationWindow {
                         rpi_joy_emu.stop()
                         rpi_joy_emu.setRecord(false)
                         rpi_joy_emu.stopRunEvent()
-                        buttonRecord.enabled = false
-                        buttonRunEvent.enabled = false
-                        iconSource = "image/res/png/gamepad.png"
-                        buttonText = "Connect"
-                        labelText = "Connect"
+                        resetToolButtons()
                     }
                 }
             }
@@ -142,5 +138,22 @@ ApplicationWindow {
 
     RpiJoyEmu {
         id: rpi_joy_emu
+    }
+
+    function resetToolButtons() {
+        buttonTransfer.enabled = true
+        buttonRecord.enabled = false
+        buttonRunEvent.enabled = false
+        buttonTransfer.iconSource = "image/res/png/gamepad.png"
+        buttonTransfer.buttonText = "Connect"
+        buttonTransfer.labelText = "Connect"
+
+        buttonRunEvent.iconSource = "image/res/png/run.png"
+        buttonRunEvent.buttonText = "Run Event"
+        buttonRunEvent.labelText = "Run Event"
+
+        buttonRecord.iconSource = "image/res/png/record.png"
+        buttonRecord.buttonText = "Record"
+        buttonRecord.labelText = "Record"
     }
 }

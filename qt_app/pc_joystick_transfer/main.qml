@@ -28,15 +28,15 @@ ApplicationWindow {
                 id: buttonTransfer
                 width: 56
                 height: 56
-                buttonText: "Start"
-                labelText: "Start"
+                buttonText: "Connect"
+                labelText: "Connect"
                 iconSource: "image/res/png/gamepad.png"
                 onSigClicked: {
                     if (iconSource == "qrc:/image/res/png/gamepad.png") {
                         rpi_joy_emu.start()
                         iconSource = "image/res/png/gamepad-stop.png"
-                        buttonText = "Stop"
-                        labelText = "Stop"
+                        buttonText = "Disconnect"
+                        labelText = "Disconnect"
                         buttonRecord.enabled = true
                         buttonRunEvent.enabled = true
                     }
@@ -47,8 +47,8 @@ ApplicationWindow {
                         buttonRecord.enabled = false
                         buttonRunEvent.enabled = false
                         iconSource = "image/res/png/gamepad.png"
-                        buttonText = "Start"
-                        labelText = "Start"
+                        buttonText = "Connect"
+                        labelText = "Connect"
                     }
                 }
             }

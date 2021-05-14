@@ -266,7 +266,7 @@ void CRpiJoyEmu::start() {
         QTcpSocket socket;
         socket.connectToHost(joyemu->m_ipAddr, QT_APP_TRANS_PORT);
 
-        if (!socket.waitForConnected()) {
+        if (!socket.waitForConnected() || QTcpSocket::ConnectedState != socket.state()) {
             qDebug("connect to host timout");
             return;
         }
@@ -278,6 +278,7 @@ void CRpiJoyEmu::start() {
         }
 
         qDebug("quit sending thread\n");
+        socket.disconnectFromHost();
         socket.close();
     }, this);
 
@@ -292,7 +293,6 @@ void CRpiJoyEmu::stop() {
         delete m_thread;
         m_thread = nullptr;
         m_quitThread = false;
-        m_mutex.lock();
     }
 }
 

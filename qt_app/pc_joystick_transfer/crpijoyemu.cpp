@@ -25,7 +25,7 @@
     d[0], d[1], d[2], d[3], \
     d[4], d[5], d[6], d[7], d[8])
 
-#define SYNC_DURATION 20
+#define SYNC_DURATION 25
 //#define SYNC_DATA \
 //    m_mutex.unlock(); \
 //    std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION)); \
@@ -250,7 +250,6 @@ void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
     }
 
     m_jsemuData[8] = QT_CHECKSUM(m_jsemuData);
-    qDebug("%02x, %d", m_jsemuData[8], sizeof(m_jsemuData));
     m_mutex.lock();
     socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
     socket.flush();

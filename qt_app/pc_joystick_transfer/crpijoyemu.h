@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QTimer>
 #include "js_def.h"
 
 #include <thread>
@@ -22,7 +23,7 @@ class CRpiJoyEmu : public QObject
 {
     Q_OBJECT
     QGamepad *m_gamdpad;
-    uint8_t m_jsemuData[REPORT_LENG];
+    uint8_t m_jsemuData[REPORT_LENG+1];
     uint8_t m_axis;
 
     double m_lx, m_ly, m_rx, m_ry;
@@ -37,6 +38,8 @@ class CRpiJoyEmu : public QObject
     QString m_szEventFile;
     bool m_bQuitEventThread;
     std::thread *m_threadRunEvent;
+
+    QTimer m_timer;
 
 public:
     explicit CRpiJoyEmu(QObject *parent = nullptr);
@@ -57,6 +60,7 @@ public slots:
     void setRecord(bool enable);
     void runEvents(QString szFile);
     void stopRunEvent();
+    void timerResetJS();
 
     void slotButtonUp(bool press);
     void slotButtonDown(bool press);

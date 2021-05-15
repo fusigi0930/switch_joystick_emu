@@ -21,17 +21,17 @@
 
 #define FLOAT_TO_AAXIS(v) static_cast<int8_t>(v * 126.0)
 
-#define DUMP_JSEMU(d) qDebug("%02x %02x %02x %02x %02x %02x %02x %02x", \
+#define DUMP_JSEMU(d) qDebug("%02x %02x %02x %02x %02x %02x %02x %02x %02x", \
     d[0], d[1], d[2], d[3], \
-    d[4], d[5], d[6], d[7])
+    d[4], d[5], d[6], d[7], d[8])
 
-#define SYNC_DURATION 5
+#define SYNC_DURATION 20
 //#define SYNC_DATA \
 //    m_mutex.unlock(); \
 //    std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION)); \
 //    m_mutex.lock();
 
-#define SYNC_DATA std::this_thread::sleep_for(std::chrono::milliseconds(1))
+#define SYNC_DATA
 
 CRpiJoyEmu::CRpiJoyEmu(QObject *parent) : QObject(parent) {
     m_gamdpad = nullptr;
@@ -43,6 +43,8 @@ CRpiJoyEmu::CRpiJoyEmu(QObject *parent) : QObject(parent) {
     m_bQuitEventThread = false;
     m_szEventFile.clear();
     m_threadRunEvent = nullptr;
+    m_timer.setSingleShot(true);
+    connect(&m_timer, &QTimer::timeout, this, &CRpiJoyEmu::timerResetJS);
 }
 
 CRpiJoyEmu::~CRpiJoyEmu() {
@@ -53,6 +55,10 @@ CRpiJoyEmu::~CRpiJoyEmu() {
         delete m_gamdpad;
         m_gamdpad = nullptr;
     }
+}
+
+void CRpiJoyEmu::timerResetJS() {
+    resetReportData();
 }
 
 void CRpiJoyEmu::axis(int val) {
@@ -167,13 +173,13 @@ void CRpiJoyEmu::slotButtonR(bool press) {
 }
 
 void CRpiJoyEmu::slotButtonZL(double value) {
-    0.6 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZL) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZL);
+    0.91 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZL) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZL);
 
     SYNC_DATA;
 }
 
 void CRpiJoyEmu::slotButtonZR(double value) {
-    0.6 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZR) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZR);
+    0.91 < value ? SET_BUTTON(m_jsemuData, 0, BTN_ZR) : UNSET_BUTTON(m_jsemuData, 0, BTN_ZR);
 
     SYNC_DATA;
 }
@@ -239,10 +245,12 @@ void CRpiJoyEmu::sendEmuData(QTcpSocket &socket) {
     if (m_bRecordJSEvent) {
         SRecordEvent event;
         //event.time = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-        memcpy(event.data, m_jsemuData, sizeof(m_jsemuData));
+        memcpy(event.data, m_jsemuData, REPORT_LENG);
         m_vtRecordData.push_back(event);
     }
 
+    m_jsemuData[8] = QT_CHECKSUM(m_jsemuData);
+    qDebug("%02x, %d", m_jsemuData[8], sizeof(m_jsemuData));
     m_mutex.lock();
     socket.write(reinterpret_cast<char*>(m_jsemuData), sizeof(m_jsemuData));
     socket.flush();

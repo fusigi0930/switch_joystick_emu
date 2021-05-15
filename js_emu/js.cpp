@@ -29,7 +29,10 @@ void CJoyStick::init() {
 
 void CJoyStick::xferData(char *data, int leng) {
 	if (-1 != m_nfd) {
-		::write(m_nfd, data, leng);
+		uint8_t buff = QT_CHECKSUM(data);
+		if (buff == data[8]) {
+			::write(m_nfd, data, REPORT_LENG);
+		}
 	}
 }
 

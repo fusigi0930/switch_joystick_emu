@@ -2,6 +2,7 @@
 #define __JS_DEF_H__
 
 #define QT_APP_TRANS_PORT               58034
+#define QT_CHECKSUM(d)                  (d[0] ^ d[1] ^ d[2] ^ d[3] ^ d[4] ^ d[5] ^ d[6] ^ d[7])
 
 #define REPORT_LENG	8
 #define AAXIS_NO_CHANGE 0x8000000

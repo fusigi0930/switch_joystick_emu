@@ -7,14 +7,20 @@ import "qrc:/modules/"
 import RpiJoyEmu 1.0
 
 ApplicationWindow {
+    id: mainWindow
     visible: true
     width: screen.width / 3
     height: 130
     title: "pc-rpi-joystick-emu transfer"
     objectName: "rpi-joystick-emu-main"
 
+    Loader {
+        id: runEventDialog
+    }
+
     onClosing: {
         console.log("closing")
+        rpi_joy_emu.stop()
     }
 
     Component.onCompleted: {
@@ -81,7 +87,14 @@ ApplicationWindow {
                 iconSource: "image/res/png/run.png"
                 onSigClicked: {
                     if (iconSource == "qrc:/image/res/png/run.png") {
-                        rpi_joy_emu.runEvents("record.bin")
+                        var dlg = runEventDialog.setSource("qrc:/modules/run_event.qml", {
+                                        visible: true,
+                                        title: "Run Event",
+                                        width: mainWindow.width,
+                                        height: mainWindow.height*3,
+                                        focus: false
+                                        } )
+                        //rpi_joy_emu.runEvents("record.bin")
                         iconSource = "image/res/png/standing.png"
                         buttonText = "Terminate"
                         labelText = "Terminate"

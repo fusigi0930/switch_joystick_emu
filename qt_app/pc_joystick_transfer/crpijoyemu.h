@@ -5,6 +5,8 @@
 #include <QTcpSocket>
 #include <QTimer>
 #include "js_def.h"
+#include <QList>
+#include <QString>
 
 #include <thread>
 #include <mutex>
@@ -36,6 +38,7 @@ class CRpiJoyEmu : public QObject
     std::vector<SRecordEvent> m_vtRecordData;
 
     QString m_szEventFile;
+    QList<QString> m_eventFiles;
     bool m_bQuitEventThread;
     std::thread *m_threadRunEvent;
 
@@ -58,7 +61,7 @@ public slots:
     void stop();
     void setIp(QString ip);
     void setRecord(bool enable);
-    void runEvents(QString szFile);
+    void runEvents(QList<QString> files);
     void stopRunEvent();
     void timerResetJS();
 

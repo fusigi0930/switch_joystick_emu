@@ -34,7 +34,7 @@ Item {
 			anchors.bottom: parent.bottom
 			font.pixelSize: parent.height * 0.3
 			font.family: "tohama"
-			color: "#A0A0FF"
+            color: enabled ? "#2020FF" : "#A0A0FF"
 			anchors.horizontalCenter: parent.horizontalCenter
 		}
 	}

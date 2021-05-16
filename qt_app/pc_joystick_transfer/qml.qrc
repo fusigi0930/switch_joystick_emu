@@ -4,6 +4,7 @@
     </qresource>
     <qresource prefix="/modules">
         <file>invi_toolbutton.qml</file>
+		<file>run_event.qml</file>
         <file>qmldir</file>
     </qresource>
     <qresource prefix="/image">

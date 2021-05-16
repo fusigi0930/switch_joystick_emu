@@ -323,53 +323,58 @@ void CRpiJoyEmu::setRecord(bool enable) {
     }
 }
 
-void CRpiJoyEmu::runEvents(QString szFile) {
+void CRpiJoyEmu::runEvents(QList<QString> files) {
     if (nullptr != m_threadRunEvent)
         return;
 
-    if (szFile.isEmpty())
+    if (files.isEmpty())
         return;
 
-    if (!QFile::exists(szFile))
-        return;
-
-    m_szEventFile = szFile;
+    m_eventFiles.clear();
+    m_eventFiles = files;
 
     m_threadRunEvent = new std::thread([](CRpiJoyEmu *joyemu)->void {
-        QFile file(joyemu->m_szEventFile);
-        if (!file.open(QIODevice::ReadOnly)) {
-            qDebug("open file error");
-            return;
-        }
-        size_t leng = static_cast<size_t>(file.size());
-        uint8_t *buff = new uint8_t[leng];
-
-        file.read(reinterpret_cast<char*>(buff), static_cast<qint64>(leng));
-        file.close();
-        SRecordEvent *event = reinterpret_cast<SRecordEvent *>(buff);
-        uint8_t *end_buff = buff + leng;
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
-
+        QList<QString>::iterator file = joyemu->m_eventFiles.begin();
         while (false == joyemu->m_bQuitEventThread) {
-            if (reinterpret_cast<size_t>(event) >= reinterpret_cast<size_t>(end_buff)) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
-                event = reinterpret_cast<SRecordEvent*>(buff);
+            QFile f(*file);
+            if (!f.open(QIODevice::ReadOnly)) {
+                qDebug("open file error");
+                return;
+            }
+            size_t leng = static_cast<size_t>(f.size());
+            uint8_t *buff = new uint8_t[leng];
+
+            f.read(reinterpret_cast<char*>(buff), static_cast<qint64>(leng));
+            f.close();
+            SRecordEvent *event = reinterpret_cast<SRecordEvent *>(buff);
+            uint8_t *end_buff = buff + leng;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+            while (false == joyemu->m_bQuitEventThread) {
+                //if (reinterpret_cast<size_t>(event) >= reinterpret_cast<size_t>(end_buff)) {
+                //    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                //    event = reinterpret_cast<SRecordEvent*>(buff);
+                //}
+
+                SRecordEvent *next = event + 1;
+                if (reinterpret_cast<size_t>(next) >= reinterpret_cast<size_t>(end_buff)) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION * 10));
+                }
+                else {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION));
+                }
+
+                memcpy(joyemu->m_jsemuData, event->data, REPORT_LENG);
+                event++;
             }
 
-            SRecordEvent *next = event + 1;
-            if (reinterpret_cast<size_t>(next) >= reinterpret_cast<size_t>(end_buff)) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION * 10));
+            delete [] buff;
+            file++;
+            if (joyemu->m_eventFiles.end() == file) {
+                file = joyemu->m_eventFiles.begin();
             }
-            else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_DURATION));
-            }
-
-            memcpy(joyemu->m_jsemuData, event->data, REPORT_LENG);
-            event++;
         }
-
-        delete [] buff;
 
     }, this);
 }

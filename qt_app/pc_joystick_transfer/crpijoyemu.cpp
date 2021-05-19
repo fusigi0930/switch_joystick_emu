@@ -314,7 +314,7 @@ void CRpiJoyEmu::setRecord(bool enable) {
         m_vtRecordData.clear();
     }
     else if (true == bOri && false == enable) {
-        QFile file("record.bin");
+        QFile file(m_szEventFile);
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Unbuffered)) {
             file.write(reinterpret_cast<char*>(&m_vtRecordData[0]), m_vtRecordData.size() * sizeof(SRecordEvent));
             file.flush();
@@ -387,4 +387,15 @@ void CRpiJoyEmu::stopRunEvent() {
         m_threadRunEvent = nullptr;
         m_bQuitEventThread = false;
     }
+}
+
+void CRpiJoyEmu::setRecordFileName(QString filename) {
+    m_szEventFile = filename;
+    if ("file:" == m_szEventFile.left(5)) {
+        m_szEventFile = m_szEventFile.mid(8);
+    }
+    if (".bin" != m_szEventFile.right(4)) {
+        m_szEventFile.append(".bin");
+    }
+    qDebug() << "set filename: " << m_szEventFile;
 }

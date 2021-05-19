@@ -64,6 +64,7 @@ public slots:
     void runEvents(QList<QString> files);
     void stopRunEvent();
     void timerResetJS();
+    void setRecordFileName(QString filename);
 
     void slotButtonUp(bool press);
     void slotButtonDown(bool press);

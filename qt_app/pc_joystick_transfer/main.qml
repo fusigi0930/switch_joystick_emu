@@ -2,6 +2,7 @@ import QtQuick.Window 2.12
 import QtQuick 2.2
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
+import Qt.labs.platform 1.1
 import "qrc:/modules/"
 
 import RpiJoyEmu 1.0
@@ -26,6 +27,22 @@ ApplicationWindow {
     Component.onCompleted: {
         console.log("start rpi joy emu class")
         rpi_joy_emu.init()
+    }
+
+    FileDialog {
+        id: saveRecordDialog
+        folder: "file:."
+        fileMode: FileDialog.SaveFile
+        onAccepted: {
+            if (currentFile === "")
+                return
+            console.log("filename: ", file)
+            rpi_joy_emu.setRecordFileName(file)
+            rpi_joy_emu.setRecord(true)
+            buttonRecord.iconSource = "image/res/png/record-stop.png"
+            buttonRecord.buttonText = "Stop"
+            buttonRecord.labelText = "Stop"
+        }
     }
 
     header: ToolBar {
@@ -64,10 +81,8 @@ ApplicationWindow {
                 iconSource: "image/res/png/record.png"
                 onSigClicked: {
                     if (iconSource == "qrc:/image/res/png/record.png") {
-                        rpi_joy_emu.setRecord(true)
-                        iconSource = "image/res/png/record-stop.png"
-                        buttonText = "Stop"
-                        labelText = "Stop"
+                        saveRecordDialog.visible = true
+                        console.log("after dialog")
                     }
                     else {
                         rpi_joy_emu.setRecord(false)

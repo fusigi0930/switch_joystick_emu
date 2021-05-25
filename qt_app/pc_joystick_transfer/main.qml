@@ -18,6 +18,17 @@ ApplicationWindow {
     Loader {
         id: runEventDialog
     }
+    Connections {
+        target: runEventDialog.item
+        onSigRunEventList: {
+            if (list.length === 0)
+                return
+            rpi_joy_emu.runEvents(list)
+            buttonRunEvent.iconSource = "image/res/png/standing.png"
+            buttonRunEvent.buttonText = "Terminate"
+            buttonRunEvent.labelText = "Terminate"
+        }
+    }
 
     onClosing: {
         console.log("closing")
@@ -109,10 +120,6 @@ ApplicationWindow {
                                         height: mainWindow.height*3,
                                         focus: false
                                         } )
-                        //rpi_joy_emu.runEvents("record.bin")
-                        iconSource = "image/res/png/standing.png"
-                        buttonText = "Terminate"
-                        labelText = "Terminate"
                     }
                     else {
                         rpi_joy_emu.stopRunEvent()
